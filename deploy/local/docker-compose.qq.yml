@@ -1,0 +1,37 @@
+# Harness-Deck Local QQ Runtime (NapCat OneBot v11)
+# Usage:
+#   Only O1 Secretary:     docker compose -f deploy/local/docker-compose.qq.yml --env-file .env up -d
+#   O1 + K1 Dual Accounts: docker compose -f deploy/local/docker-compose.qq.yml --env-file .env --profile k1 up -d
+
+services:
+  napcat-o1:
+    image: mlikiowa/napcat-docker:latest
+    container_name: harness-deck-napcat-o1
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+      - NAPCAT_UID=1000
+      - NAPCAT_GID=1000
+      - ACCOUNT=${NAPCAT_O1_ACCOUNT:-}
+    ports:
+      - "127.0.0.1:${NAPCAT_O1_WS_PORT:-3001}:3001"
+      - "127.0.0.1:${NAPCAT_O1_WEBUI_PORT:-6099}:6099"
+    volumes:
+      - ./data/napcat-o1/config:/app/napcat/config
+      - ./data/napcat-o1/ntqq:/app/.config/QQ
+
+  napcat-k1:
+    image: mlikiowa/napcat-docker:latest
+    container_name: harness-deck-napcat-k1
+    profiles: ["k1"]
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+      - NAPCAT_UID=1000
+      - NAPCAT_GID=1000
+    ports:
+      - "127.0.0.1:3002:3001"
+      - "127.0.0.1:${NAPCAT_K1_WEBUI_PORT:-6100}:6099"
+    volumes:
+      - ./data/napcat-k1/config:/app/napcat/config
+      - ./data/napcat-k1/ntqq:/app/.config/QQ

@@ -1,0 +1,84 @@
+# Harness-Deck Remote Linux VPS Stack
+# Includes: Lightweight deck-relay + NapCat (O1 & optional K1) + Deck QQ Bridge
+# Usage on VPS:
+#   ./setup-vps.sh                (O1 Secretary only)
+#   ./setup-vps.sh --profile k1   (O1 Secretary + K1 Community Frontline)
+
+services:
+  deck-relay:
+    build:
+      context: .
+      dockerfile: Dockerfile.deck-runtime
+    container_name: harness-deck-relay
+    restart: unless-stopped
+    command: ["node", "--no-warnings", "packages/cli/dist/index.js", "relay", "--host", "0.0.0.0", "--port", "8787", "--data-dir", "/data/mailroom"]
+    env_file:
+      - .env
+    ports:
+      - "${DECK_RELAY_BIND:-0.0.0.0}:${DECK_RELAY_PORT:-8787}:8787"
+    volumes:
+      - ./data/mailroom:/data/mailroom
+
+  napcat-o1:
+    image: mlikiowa/napcat-docker:latest
+    container_name: harness-deck-napcat-o1
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+      - NAPCAT_UID=1000
+      - NAPCAT_GID=1000
+    ports:
+      - "127.0.0.1:3001:3001"
+      - "${NAPCAT_WEBUI_BIND:-127.0.0.1}:${NAPCAT_O1_WEBUI_PORT:-6099}:6099"
+    volumes:
+      - ./napcat-o1/config:/app/napcat/config
+      - ./data/napcat-o1/ntqq:/app/.config/QQ
+
+  qq-bridge-o1:
+    build:
+      context: .
+      dockerfile: Dockerfile.deck-runtime
+    container_name: harness-deck-qq-bridge-o1
+    restart: unless-stopped
+    depends_on:
+      - deck-relay
+      - napcat-o1
+    command: ["node", "--no-warnings", "packages/cli/dist/index.js", "qq-bridge", "--profile", "o1"]
+    env_file:
+      - .env
+    environment:
+      - DECK_ENDPOINT=http://deck-relay:8787
+      - NAPCAT_O1_WS_URL=ws://napcat-o1:3001
+
+  napcat-k1:
+    image: mlikiowa/napcat-docker:latest
+    container_name: harness-deck-napcat-k1
+    profiles: ["k1"]
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+      - NAPCAT_UID=1000
+      - NAPCAT_GID=1000
+    ports:
+      - "127.0.0.1:3002:3001"
+      - "${NAPCAT_WEBUI_BIND:-127.0.0.1}:${NAPCAT_K1_WEBUI_PORT:-6100}:6099"
+    volumes:
+      - ./napcat-k1/config:/app/napcat/config
+      - ./data/napcat-k1/ntqq:/app/.config/QQ
+
+  qq-bridge-k1:
+    build:
+      context: .
+      dockerfile: Dockerfile.deck-runtime
+    container_name: harness-deck-qq-bridge-k1
+    profiles: ["k1"]
+    restart: unless-stopped
+    depends_on:
+      - deck-relay
+      - napcat-k1
+    command: ["node", "--no-warnings", "packages/cli/dist/index.js", "qq-bridge", "--profile", "k1"]
+    env_file:
+      - .env
+    environment:
+      - DECK_ENDPOINT=http://deck-relay:8787
+      - NAPCAT_K1_WS_URL=ws://napcat-k1:3001

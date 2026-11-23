@@ -1,0 +1,32 @@
+# Dependencies & builds
+node_modules/
+dist/
+dist-bundle/
+*.tsbuildinfo
+
+# Secrets & local runtime state (NEVER commit!)
+.env
+.env.*
+!.env.example
+.deck/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.pem
+*.key
+id_ed25519*
+id_rsa*
+
+# Deploy runtime data (QQ sessions, tokens, logs)
+deploy/**/data/
+deploy/**/napcat/config/
+deploy/**/ntqq/
+deploy/**/.env
+deploy/generated/
+
+# OS & editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

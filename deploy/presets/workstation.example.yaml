@@ -1,0 +1,52 @@
+# 示例桌面工位配置（由 `pnpm deck init` 或引导向导自动生成至 .deck/workstation.yaml）
+node_id: "dev-pc-main"
+platform: "windows"
+max_concurrent_tasks: 2
+worktree_root: ".deck/worktrees"
+
+workspaces:
+  coomi:
+    path: "/path/to/Projects/Coomi"
+    git_isolation: "worktree"
+    default_branch: "main"
+  qmmi:
+    path: "/path/to/Projects/Qmmi"
+    git_isolation: "worktree"
+    default_branch: "main"
+  harness-deck:
+    path: "/path/to/Projects/Harness-Deck"
+    git_isolation: "worktree"
+    default_branch: "main"
+
+engineers:
+  dsh:
+    driver: "dsh-cli"
+    enabled: true
+    strengths: ["harness", "cordis-plugin", "general"]
+    default_timeout_min: 20
+  claude:
+    driver: "claude-code-cli"
+    enabled: true
+    strengths: ["architecture", "rust", "complex-debug"]
+    default_timeout_min: 25
+  codex:
+    driver: "codex-cli"
+    enabled: true
+    strengths: ["fast-patch", "unit-test", "pr-review"]
+    default_timeout_min: 15
+  agy:
+    driver: "agy-cli"
+    enabled: true
+    strengths: ["fullstack", "research", "ui"]
+    default_timeout_min: 25
+  zcode:
+    driver: "zcode-cli"
+    enabled: true
+    strengths: ["frontend", "quick-fix"]
+    default_timeout_min: 15
+  custom_example:
+    driver: "custom-cli"
+    enabled: false
+    command_template: ["my-agent-cli", "--cwd", "{{cwd}}", "--prompt", "{{prompt}}"]
+    strengths: ["custom"]
+    default_timeout_min: 15

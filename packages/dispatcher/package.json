@@ -1,0 +1,24 @@
+{
+  "name": "@harness-deck/dispatcher",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --no-warnings --test dist/dispatcher.test.js",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "@harness-deck/mailroom": "workspace:*",
+    "@harness-deck/protocol": "workspace:*",
+    "yaml": "^2.7.0"
+  }
+}

@@ -1,0 +1,8 @@
+node_modules
+.deck
+dist-bundle
+data
+napcat-o1
+napcat-k1
+*.log
+*.sqlite*

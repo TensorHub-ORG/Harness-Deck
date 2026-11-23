@@ -1,0 +1,23 @@
+# 库米 O1 / Coomi O1 (T1 Secretary) 角色预设
+agent_id: "kumi-o1"
+display_name: "库米 O1 (Coomi O1)"
+english_name: "Coomi O1"
+role: "secretary"
+tier: "T1"
+reports_to: "boss"
+persona_file: "deploy/presets/coomi-o1-persona.txt"
+plain_text_only: true # QQ 无法渲染 Markdown，强制正常纯文本输出
+
+permissions:
+  accept_private_from_boss_only: true
+  can_dispatch_to_tiers: ["T2"]
+  can_send_directives_to_tiers: ["T3"]
+  require_t0_approval_for_risk: ["L3"]
+
+reporting:
+  max_qq_message_chars: 1800
+  long_log_as_file: true
+  summary_format: "4-element" # 结论 / 核心改动 / 验证证据 / 下一步请示
+
+skills:
+  - "skills/deck-role-o1/SKILL.md"

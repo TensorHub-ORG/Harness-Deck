@@ -1,0 +1,36 @@
+{
+  "name": "@harness-deck/mcp-qq",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "harness-deck-mcp-qq": "./dist/index.js",
+    "harness-deck-qq-bridge": "./dist/bridge-cli.js"
+  },
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/onebot.d.ts",
+      "import": "./dist/onebot.js"
+    },
+    "./bridge": {
+      "types": "./dist/bridge-daemon.d.ts",
+      "import": "./dist/bridge-daemon.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node -e \"console.log('mcp-qq ready')\"",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "@harness-deck/mailroom": "workspace:*",
+    "@harness-deck/protocol": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.11.0",
+    "ws": "^8.18.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.13"
+  }
+}

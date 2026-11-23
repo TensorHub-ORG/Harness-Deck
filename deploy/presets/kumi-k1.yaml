@@ -1,0 +1,22 @@
+# 库米 K1 (T3 Community Frontline) 角色预设
+agent_id: "kumi-k1"
+display_name: "库米 K1"
+role: "frontline"
+tier: "T3"
+reports_to: "kumi-o1"
+
+permissions:
+  group_whitelist_only: true
+  can_dm_boss: false
+  can_dispatch_workers: false
+  kb_access: "readonly"
+  allowed_escalation_targets: ["kumi-o1"]
+
+escalation_policy:
+  schedule_daily_cron: "30 20 * * *"
+  similar_issue_threshold: 3
+  total_pending_threshold: 10
+  urgent_immediate: true
+
+skills:
+  - "skills/deck-role-k1/SKILL.md"
