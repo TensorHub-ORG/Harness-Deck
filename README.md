@@ -1,7 +1,17 @@
 # Harness-Deck
 
-> **以人为核心驾驭主体（Human-in-the-Loop）的多 Agent 分层协作开放协议（HDP v1）与「多 Skill + 多 MCP + 0 基础交互式引导」整合包**。
+> **Harness-Deck — 驾驭你的 AI 舰队！ / Harness-Deck - Command your AI fleet!**
+>
+> 以人为核心驾驭主体（Human-in-the-Loop）的多 Agent 分层协作开放协议（HDP v1）与「多 Skill + 多 MCP + 0 基础交互式引导」整合包。
 > 面向 [TensorHub-ORG](https://github.com/TensorHub-ORG) 开源项目自动化维护体系（Coomi、Qmmi、Latexsnipper、Storydex 等），同时保持完全工具中立。
+
+---
+
+## 系统架构
+
+![Harness-Deck v1 系统架构图](docs/architecture.png)
+
+> 矢量高清源图：[`docs/architecture.svg`](docs/architecture.svg) · 高清成图（3200×2160）：[`docs/architecture.png`](docs/architecture.png)
 
 ---
 

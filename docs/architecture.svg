@@ -1,0 +1,274 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1080" width="1600" height="1080">
+  <defs>
+    <style>
+      .bg { fill: #141518; }
+      .grp-body { fill: #181a1f; stroke: #2f333d; stroke-width: 1.2; }
+      .grp-hdr { fill: #1f2228; stroke: #2f333d; stroke-width: 1.2; }
+      .grp-title { fill: #c2c8d4; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 13px; font-weight: 600; }
+      .grp-sub { fill: #7f8797; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 11.5px; font-weight: 400; }
+      .node { fill: #22252d; stroke: #3e424f; stroke-width: 1.2; }
+      .node-subbox { fill: #1d2027; stroke: #363a46; stroke-width: 1.1; }
+      .node-dashed { fill: #1b1e24; stroke: #3c404d; stroke-width: 1.1; stroke-dasharray: 5 4; }
+      .node-title { fill: #eceff4; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 14px; font-weight: 600; }
+      .node-sub { fill: #8f96a6; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 11.5px; }
+      .tier-pill { fill: #2c303b; stroke: #4c5263; stroke-width: 1; }
+      .tier-text { fill: #d5dae5; font-family: "Consolas", "JetBrains Mono", monospace; font-size: 11px; font-weight: 700; }
+      .edge-solid { fill: none; stroke: #6a7180; stroke-width: 1.4; }
+      .edge-dashed { fill: none; stroke: #606775; stroke-width: 1.3; stroke-dasharray: 5 4; }
+      .edge-pill { fill: #16181d; stroke: #2d313b; stroke-width: 1; }
+      .edge-label { fill: #b3b9c6; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 11.5px; }
+      .wall-pill { fill: #21191b; stroke: #5f3439; stroke-width: 1.1; }
+      .wall-label { fill: #d4949a; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 11.5px; font-weight: 600; }
+      .footer-bar { fill: #1c1f26; stroke: #323642; stroke-width: 1; }
+      .footer-text { fill: #8f96a6; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 12px; }
+    </style>
+
+    <marker id="arrow-end" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+      <path d="M 1 1.5 L 9 5 L 1 8.5 z" fill="#8d94a3" />
+    </marker>
+    <marker id="arrow-start" viewBox="0 0 10 10" refX="1.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+      <path d="M 9 1.5 L 1 5 L 9 8.5 z" fill="#8d94a3" />
+    </marker>
+    <marker id="arrow-dashed-end" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 1 1.5 L 9 5 L 1 8.5 z" fill="#7c8392" />
+    </marker>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect class="bg" x="0" y="0" width="1600" height="1080" />
+
+  <!-- =================================================================== -->
+  <!-- ROW 1: HUMAN COMMAND & EXTERNAL PUBLIC  |  UNIVERSAL BUNDLE ASSETS  -->
+  <!-- =================================================================== -->
+
+  <!-- Left Group: Human Command & Public -->
+  <rect class="grp-body" x="40" y="28" width="960" height="126" rx="3" />
+  <rect class="grp-hdr" x="40" y="28" width="960" height="30" rx="3" />
+  <text class="grp-title" x="56" y="48">人类指挥与外部公域</text>
+  <text class="grp-sub" x="984" y="47.5" text-anchor="end">T0 最高人类授权 · 外部社区输入默认不可信</text>
+
+  <!-- Node: Boss T0 -->
+  <rect class="node" x="64" y="74" width="440" height="62" rx="3" />
+  <rect class="tier-pill" x="80" y="86" width="32" height="19" rx="2" />
+  <text class="tier-text" x="96" y="99.5" text-anchor="middle">T0</text>
+  <text class="node-title" x="122" y="100">老板 · 核心维护者（QQ 私聊 / 真实使用中的 Agent）</text>
+  <text class="node-sub" x="80" y="122">目标下达 · L3 短码审批（批准 A-xxxx / 授权）· 验收与退回返工</text>
+
+  <!-- Node: Community Group -->
+  <rect class="node" x="536" y="74" width="440" height="62" rx="3" />
+  <text class="node-title" x="756" y="100" text-anchor="middle">TensorHub 社区 QQ 交流群（外部不可信输入）</text>
+  <text class="node-sub" x="756" y="122" text-anchor="middle">日常提问 · Bug / 需求反馈 · 社区二开线索 · 发版后回访</text>
+
+  <!-- Right Group: Harness-Deck Universal Bundle Assets -->
+  <rect class="grp-body" x="1040" y="28" width="520" height="126" rx="3" />
+  <rect class="grp-hdr" x="1040" y="28" width="520" height="30" rx="3" />
+  <text class="grp-title" x="1056" y="48">Harness-Deck 整合包资产</text>
+  <text class="grp-sub" x="1544" y="47.5" text-anchor="end">任意 Agent 解包可读</text>
+
+  <!-- Node: Bundle Skills -->
+  <rect class="node" x="1064" y="74" width="472" height="62" rx="3" />
+  <text class="node-title" x="1300" y="100" text-anchor="middle">START_HERE.md + 6 个模块化 Skill + 部署套件</text>
+  <text class="node-sub" x="1300" y="122" text-anchor="middle">0基础交互问询向导 · 断点续装 · 本地 / SSH 双分支 · O1 / K1 / 工程师 SOP</text>
+
+  <!-- =================================================================== -->
+  <!-- ROW 2: QQ EDGE LAYER (COOMI O1 T1  |  COOMI K1 T3)                  -->
+  <!-- =================================================================== -->
+  <rect class="grp-body" x="40" y="226" width="960" height="136" rx="3" />
+  <rect class="grp-hdr" x="40" y="226" width="960" height="30" rx="3" />
+  <text class="grp-title" x="56" y="246">QQ 边缘交互层</text>
+  <text class="grp-sub" x="520" y="245.5" text-anchor="middle">Qmmi / NapCat OneBot v11 · 推荐独立双号防风控</text>
+
+  <!-- Node: Coomi O1 (T1) -->
+  <rect class="node" x="64" y="274" width="420" height="70" rx="3" />
+  <rect class="tier-pill" x="80" y="287" width="32" height="19" rx="2" />
+  <text class="tier-text" x="96" y="300.5" text-anchor="middle">T1</text>
+  <text class="node-title" x="122" y="301">库米 O1 · Coomi O1（秘书主管）</text>
+  <text class="node-sub" x="80" y="325">理工女 1v1 纯文本人设 · LLM 调度大脑 · 防注入审查隔离阀</text>
+
+  <!-- Center vertical dashed divider between O1 & K1 -->
+  <line x1="520" y1="274" x2="520" y2="344" stroke="#3c404d" stroke-width="1.2" stroke-dasharray="4 3" />
+
+  <!-- Node: Coomi K1 (T3) -->
+  <rect class="node" x="556" y="274" width="420" height="70" rx="3" />
+  <rect class="tier-pill" x="572" y="287" width="32" height="19" rx="2" />
+  <text class="tier-text" x="588" y="300.5" text-anchor="middle">T3</text>
+  <text class="node-title" x="614" y="301">库米 K1 · Coomi K1（公域前线）</text>
+  <text class="node-sub" x="572" y="325">只读知识库答疑 · 结构化采集反馈 · 禁越级联 T0 / 禁触达 T2</text>
+
+  <!-- =================================================================== -->
+  <!-- ROW 3: HDP v1 PROTOCOL & DUAL-MODE MAILROOM                         -->
+  <!-- =================================================================== -->
+  <rect class="grp-body" x="40" y="438" width="1220" height="184" rx="3" />
+  <rect class="grp-hdr" x="40" y="438" width="1220" height="30" rx="3" />
+  <text class="grp-title" x="56" y="458">Harness-Deck 收发室层</text>
+  <text class="grp-sub" x="1244" y="457.5" text-anchor="end">HDP v1 核心协议 · 极简可插拔传输 · 零重型中台</text>
+
+  <!-- Top Span: Deck Mailroom Core -->
+  <rect class="node" x="64" y="484" width="1172" height="50" rx="3" />
+  <text class="node-title" x="650" y="514" text-anchor="middle">Deck Mailroom（HDP v1 协议校验 / T0&gt;T1&gt;T2&gt;T3 硬路由 / L3 SQLite 持久化审批 / 密钥脱敏 / max_hops 熔断 / trace_id 审计）</text>
+
+  <!-- Internal vertical stems from Mailroom Core down to 3 capability sub-boxes -->
+  <line class="edge-solid" x1="251" y1="534" x2="251" y2="556" />
+  <line class="edge-solid" x1="650" y1="534" x2="650" y2="556" />
+  <line class="edge-solid" x1="1049" y1="534" x2="1049" y2="556" />
+
+  <!-- Sub-box 1: Mode A (aligned directly above MCP direct link x=251) -->
+  <rect class="node-subbox" x="64" y="556" width="374" height="50" rx="3" />
+  <text class="node-title" x="251" y="577" text-anchor="middle" style="font-size:13px;">模式 A：同机零服务模式</text>
+  <text class="node-sub" x="251" y="596" text-anchor="middle">file:// 本地 node:sqlite + 共享目录，零独立进程</text>
+
+  <!-- Sub-box 2: Artifact & KB (centered above T2 ↮ T3 firewall callout) -->
+  <rect class="node-subbox" x="463" y="556" width="374" height="50" rx="3" />
+  <text class="node-title" x="650" y="577" text-anchor="middle" style="font-size:13px;">工件中转 &amp; 轻量知识/反馈库</text>
+  <text class="node-sub" x="650" y="596" text-anchor="middle">SHA256 文件中转（PDF/日志/APK）· 只读 KB · 反馈账本</text>
+
+  <!-- Sub-box 3: Mode B (aligned directly above WS/SSH tunnel x=1010) -->
+  <rect class="node-subbox" x="862" y="556" width="374" height="50" rx="3" />
+  <text class="node-title" x="1049" y="577" text-anchor="middle" style="font-size:13px;">模式 B：跨端轻量 deck-relay</text>
+  <text class="node-sub" x="1049" y="596" text-anchor="middle">VPS ~23MB 原生 systemd + SSH 加密隧道 / 出站 WS</text>
+
+  <!-- =================================================================== -->
+  <!-- ROW 4: T2 INTERNAL EXECUTION LAYER (DESKTOP ENGINEERS & PIPELINES)  -->
+  <!-- =================================================================== -->
+  <rect class="grp-body" x="40" y="700" width="1520" height="348" rx="3" />
+  <rect class="grp-hdr" x="40" y="700" width="1520" height="30" rx="3" />
+  <text class="grp-title" x="56" y="720">内网执行层 · T2</text>
+  <text class="grp-sub" x="1544" y="719.5" text-anchor="end">个人电脑 / 多 CLI 引擎 · 严格项目目录白名单 &amp; Git Worktree 强制隔离</text>
+
+  <!-- Top Row inside T2: MCP Suite | Deck Dispatcher | Adapters & Packs -->
+  <rect class="node" x="64" y="746" width="510" height="62" rx="3" />
+  <text class="node-title" x="319" y="772" text-anchor="middle">通用 MCP 套件（按 T0-T3 角色动态暴露工具）</text>
+  <text class="node-sub" x="319" y="794" text-anchor="middle">deck-comm · deck-dispatch · deck-qq · deck-kb</text>
+
+  <rect class="node" x="610" y="746" width="600" height="62" rx="3" />
+  <rect class="tier-pill" x="626" y="758" width="32" height="19" rx="2" />
+  <text class="tier-text" x="642" y="771.5" text-anchor="middle">T2</text>
+  <text class="node-title" x="668" y="772">桌面工长 · Deck Dispatcher（多 CLI 调度与监护）</text>
+  <text class="node-sub" x="626" y="794">工位注册 · Git Worktree 隔离 · 3档沙箱 · Windows .cmd 解包 · 超时强杀与兜底捕获</text>
+
+  <!-- Dashed plugin/pack link between Dispatcher and Adapters/Packs -->
+  <line class="edge-dashed" x1="1210" y1="777" x2="1242" y2="777" />
+
+  <rect class="node-dashed" x="1244" y="746" width="292" height="62" rx="3" />
+  <text class="node-title" x="1390" y="772" text-anchor="middle" style="font-size:13px;">可选深度适配 &amp; 业务管线槽</text>
+  <text class="node-sub" x="1390" y="794" text-anchor="middle">adapters/dsh-plugin · packs/*</text>
+
+  <!-- Dual Horizontal Bus Rails inside T2 (ZERO stem crossing + crisp bridge halos) -->
+  <!-- 1. Dashed MCP Callback Bus drawn first (stem at x=156 left of solid bus x=192) -->
+  <path class="edge-dashed" d="M 156 808 L 156 898" marker-end="url(#arrow-dashed-end)" />
+  <path class="edge-dashed" d="M 156 868 L 1401 868" />
+  <path class="edge-dashed" d="M 405 868 L 405 898" marker-end="url(#arrow-dashed-end)" />
+  <path class="edge-dashed" d="M 654 868 L 654 898" marker-end="url(#arrow-dashed-end)" />
+  <path class="edge-dashed" d="M 903 868 L 903 898" marker-end="url(#arrow-dashed-end)" />
+  <path class="edge-dashed" d="M 1152 868 L 1152 898" marker-end="url(#arrow-dashed-end)" />
+  <path class="edge-dashed" d="M 1401 868 L 1401 898" marker-end="url(#arrow-dashed-end)" />
+
+  <!-- 2. Subtle dark bridge cutouts where solid drops pass over the dashed horizontal rail -->
+  <line x1="192" y1="862" x2="192" y2="874" stroke="#181a1f" stroke-width="6" />
+  <line x1="441" y1="862" x2="441" y2="874" stroke="#181a1f" stroke-width="6" />
+  <line x1="690" y1="862" x2="690" y2="874" stroke="#181a1f" stroke-width="6" />
+  <line x1="939" y1="862" x2="939" y2="874" stroke="#181a1f" stroke-width="6" />
+  <line x1="1188" y1="862" x2="1188" y2="874" stroke="#181a1f" stroke-width="6" />
+
+  <!-- 3. Solid Dispatch Bus from Deck Dispatcher (x=910, y=808) -->
+  <path class="edge-solid" d="M 910 808 L 910 840" />
+  <path class="edge-solid" d="M 192 840 L 1437 840" />
+  <path class="edge-solid" d="M 192 840 L 192 898" marker-end="url(#arrow-end)" />
+  <path class="edge-solid" d="M 441 840 L 441 898" marker-end="url(#arrow-end)" />
+  <path class="edge-solid" d="M 690 840 L 690 898" marker-end="url(#arrow-end)" />
+  <path class="edge-solid" d="M 939 840 L 939 898" marker-end="url(#arrow-end)" />
+  <path class="edge-solid" d="M 1188 840 L 1188 898" marker-end="url(#arrow-end)" />
+  <path class="edge-solid" d="M 1437 840 L 1437 898" marker-end="url(#arrow-end)" />
+
+  <!-- Bus Pill Labels seated directly ON their respective bus rails -->
+  <rect class="edge-pill" x="742" y="828" width="116" height="24" rx="3" />
+  <text class="edge-label" x="800" y="844" text-anchor="middle">工单派发总线</text>
+  <rect class="edge-pill" x="206" y="856" width="186" height="24" rx="3" />
+  <text class="edge-label" x="299" y="872" text-anchor="middle">桌面 Agent 共用 MCP 回报通道</text>
+
+  <!-- 6 Symmetrical CLI Engineer Cards (y = 900 .. 972, w = 226, gap = 23) -->
+  <!-- Card 1: dsh CLI -->
+  <rect class="node" x="64" y="900" width="226" height="72" rx="3" />
+  <text class="node-title" x="177" y="929" text-anchor="middle">dsh CLI</text>
+  <text class="node-sub" x="177" y="952" text-anchor="middle">headless --json · 首个适配参考</text>
+
+  <!-- Card 2: agy CLI -->
+  <rect class="node" x="313" y="900" width="226" height="72" rx="3" />
+  <text class="node-title" x="426" y="929" text-anchor="middle">agy CLI</text>
+  <text class="node-sub" x="426" y="952" text-anchor="middle">--print --mode · 实测打通</text>
+
+  <!-- Card 3: claude CLI -->
+  <rect class="node" x="562" y="900" width="226" height="72" rx="3" />
+  <text class="node-title" x="675" y="929" text-anchor="middle">claude CLI</text>
+  <text class="node-sub" x="675" y="952" text-anchor="middle">-p stream-json · --resume</text>
+
+  <!-- Card 4: codex CLI -->
+  <rect class="node" x="811" y="900" width="226" height="72" rx="3" />
+  <text class="node-title" x="924" y="929" text-anchor="middle">codex CLI</text>
+  <text class="node-sub" x="924" y="952" text-anchor="middle">exec --json --sandbox</text>
+
+  <!-- Card 5: zcode / coomi -->
+  <rect class="node" x="1060" y="900" width="226" height="72" rx="3" />
+  <text class="node-title" x="1173" y="929" text-anchor="middle">zcode / coomi CLI</text>
+  <text class="node-sub" x="1173" y="952" text-anchor="middle">内置驱动 · 统一隔离调度</text>
+
+  <!-- Card 6: custom-cli -->
+  <rect class="node-dashed" x="1309" y="900" width="227" height="72" rx="3" />
+  <text class="node-title" x="1422.5" y="929" text-anchor="middle">custom-cli 扩展</text>
+  <text class="node-sub" x="1422.5" y="952" text-anchor="middle">YAML 命令模板接入任意新 CLI</text>
+
+  <!-- Bottom Tooling & Pipeline Strip -->
+  <rect class="footer-bar" x="64" y="994" width="1472" height="36" rx="3" />
+  <text class="footer-text" x="800" y="1016.5" text-anchor="middle">
+    统一工具链 deck CLI（scan / init / deploy-ssh / doctor / trace / mock）  ·  后期按需挂载 packs/（GitHub 二开巡检 / 官网前端发布 / 反馈看板同步 / 聚合 API 预留槽）
+  </text>
+
+  <!-- =================================================================== -->
+  <!-- INTER-LAYER ORTHOGONAL CONNECTORS & EDGE LABELS (ZERO CROSSINGS)    -->
+  <!-- =================================================================== -->
+
+  <!-- 1. Boss (T0) <-> Coomi O1 (T1) -->
+  <path class="edge-solid" d="M 274 138 L 274 272" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+  <rect class="edge-pill" x="169" y="178" width="210" height="24" rx="3" />
+  <text class="edge-label" x="274" y="194" text-anchor="middle">私聊指令 / L3 审批 / 简报与文件</text>
+
+  <!-- 2. Community Group <-> Coomi K1 (T3) -->
+  <path class="edge-solid" d="M 766 138 L 766 272" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+  <rect class="edge-pill" x="668" y="178" width="196" height="24" rx="3" />
+  <text class="edge-label" x="766" y="194" text-anchor="middle">群内答疑 / 反馈收集 / 闭环回访</text>
+
+  <!-- 3. Bundle Assets -> QQ Edge Layer (dashed elbow) -->
+  <path class="edge-dashed" d="M 1185 154 L 1185 294 L 1002 294" marker-end="url(#arrow-dashed-end)" />
+  <rect class="edge-pill" x="1086" y="218" width="198" height="24" rx="3" />
+  <text class="edge-label" x="1185" y="234" text-anchor="middle">按需引导本地或 SSH 服务器部署</text>
+
+  <!-- 4. Bundle Assets -> T2 Execution Layer (clean right express lane x=1440) -->
+  <path class="edge-dashed" d="M 1440 154 L 1440 698" marker-end="url(#arrow-dashed-end)" />
+  <rect class="edge-pill" x="1328" y="420" width="224" height="24" rx="3" />
+  <text class="edge-label" x="1440" y="436" text-anchor="middle">任意 Agent 读教程自动问询配置</text>
+
+  <!-- 5. Coomi O1 (T1) <-> Deck Mailroom -->
+  <path class="edge-solid" d="M 274 346 L 274 482" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+  <rect class="edge-pill" x="150" y="388" width="248" height="24" rx="3" />
+  <text class="edge-label" x="274" y="404" text-anchor="middle">T1 令牌：派单 / 读简报 / 发指令 / 工件</text>
+
+  <!-- 6. Coomi K1 (T3) <-> Deck Mailroom -->
+  <path class="edge-solid" d="M 766 346 L 766 482" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+  <rect class="edge-pill" x="634" y="388" width="264" height="24" rx="3" />
+  <text class="edge-label" x="766" y="404" text-anchor="middle">T3 令牌：仅结构化上报 &amp; 收 T1 下发指令</text>
+
+  <!-- 7. Deck Mailroom <-> MCP Suite (left channel x=251) -->
+  <path class="edge-solid" d="M 251 624 L 251 744" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+  <rect class="edge-pill" x="164" y="650" width="174" height="24" rx="3" />
+  <text class="edge-label" x="251" y="666" text-anchor="middle">MCP 工具直连（T2 令牌）</text>
+
+  <!-- 8. Hard Isolation Firewall Callout (centered between x=251 and x=1010 -> x=630) -->
+  <rect class="wall-pill" x="462" y="649" width="336" height="26" rx="3" />
+  <text class="wall-label" x="630" y="666.5" text-anchor="middle">✕ 硬权限隔离：T2 内网执行 ↮ T3 公域前线 严禁直连</text>
+
+  <!-- 9. Deck Mailroom (Mode B) <-> Deck Dispatcher (right channel x=1010) -->
+  <path class="edge-solid" d="M 1010 624 L 1010 744" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+  <rect class="edge-pill" x="896" y="650" width="228" height="24" rx="3" />
+  <text class="edge-label" x="1010" y="666" text-anchor="middle">出站 WS / SSH 隧道（免桌面公网 IP）</text>
+
+</svg>
