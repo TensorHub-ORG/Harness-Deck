@@ -84,6 +84,7 @@ export class DeckDispatcher {
   private hbTimer: NodeJS.Timeout | null = null;
   private unsubscribeWs: (() => void) | null = null;
   private stopped = false;
+  private lastNetErrLogAt = 0;
 
   constructor(private readonly options: DispatcherOptions) {
     this.agentId = options.agentId ?? `dispatcher-${options.workstation.node_id}`;
@@ -92,26 +93,35 @@ export class DeckDispatcher {
     this.log = options.logger ?? ((msg) => console.error(`[dispatcher] ${msg}`));
   }
 
+  private logTransientError(scope: string, err: unknown): void {
+    const now = Date.now();
+    if (now - this.lastNetErrLogAt < 30_000) return;
+    this.lastNetErrLogAt = now;
+    this.log(`Transient ${scope} error (will retry): ${err instanceof Error ? err.message : String(err)}`);
+  }
+
   public async start(): Promise<void> {
     this.stopped = false;
     await this.registerWorkstation();
 
     if (this.options.client.subscribeEnvelopes) {
       this.unsubscribeWs = this.options.client.subscribeEnvelopes(this.agentId, (env) => {
-        void this.handleEnvelope(env);
+        void this.handleEnvelope(env).catch((err) => this.logTransientError("ws-envelope", err));
       });
     }
 
     const pollMs = this.options.pollIntervalMs ?? 2500;
     this.pollTimer = setInterval(() => {
-      void this.pollOnce();
+      void this.pollOnce().catch((err) => this.logTransientError("poll", err));
     }, pollMs);
 
     this.hbTimer = setInterval(() => {
-      void this.options.client.heartbeat(this.agentId, this.buildMetadata());
+      void this.options.client
+        .heartbeat(this.agentId, this.buildMetadata())
+        .catch((err) => this.logTransientError("heartbeat", err));
     }, 30_000);
 
-    await this.pollOnce();
+    await this.pollOnce().catch((err) => this.logTransientError("initial-poll", err));
     this.log(`Started node "${this.agentId}" (mode=${this.options.client.mode}).`);
   }
 

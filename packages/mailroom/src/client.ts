@@ -134,21 +134,48 @@ export class RemoteMailroomClient implements MailroomClient {
     this.baseUrl = endpoint.replace(/^ws(s?):\/\//, "http$1://").replace(/\/+$/, "");
   }
 
+  private isTransientSocketError(err: unknown): boolean {
+    if (!(err instanceof Error)) return false;
+    const msg = `${err.message} ${String((err as { cause?: { code?: string; message?: string } }).cause?.code ?? "")} ${String((err as { cause?: { message?: string } }).cause?.message ?? "")}`;
+    return /fetch failed|UND_ERR_SOCKET|ECONNRESET|EPIPE|other side closed|socket hang up/i.test(msg);
+  }
+
   private async request<T>(method: string, pathStr: string, body?: unknown): Promise<T> {
-    const res = await fetch(`${this.baseUrl}${pathStr}`, {
-      method,
-      headers: {
-        authorization: `Bearer ${this.token}`,
-        "content-type": "application/json",
-      },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
-    });
-    const text = await res.text();
-    const json = text ? (JSON.parse(text) as Record<string, unknown>) : {};
-    if (!res.ok) {
-      throw new Error(`Relay ${res.status} (${String(json.error ?? "ERROR")}): ${String(json.message ?? text)}`);
+    const canRetry =
+      method === "GET" ||
+      pathStr === "/api/heartbeat" ||
+      pathStr === "/api/agents" ||
+      pathStr === "/api/ack";
+    const maxAttempts = canRetry ? 2 : 1;
+
+    let lastErr: unknown;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const res = await fetch(`${this.baseUrl}${pathStr}`, {
+          method,
+          headers: {
+            authorization: `Bearer ${this.token}`,
+            "content-type": "application/json",
+          },
+          body: body !== undefined ? JSON.stringify(body) : undefined,
+          signal: AbortSignal.timeout(20_000),
+        });
+        const text = await res.text();
+        const json = text ? (JSON.parse(text) as Record<string, unknown>) : {};
+        if (!res.ok) {
+          throw new Error(`Relay ${res.status} (${String(json.error ?? "ERROR")}): ${String(json.message ?? text)}`);
+        }
+        return json as T;
+      } catch (err) {
+        lastErr = err;
+        if (attempt < maxAttempts && this.isTransientSocketError(err)) {
+          await new Promise((r) => setTimeout(r, 250));
+          continue;
+        }
+        throw err;
+      }
     }
-    return json as T;
+    throw lastErr;
   }
 
   registerAgent(params: Parameters<MailroomStore["registerAgent"]>[0]): Promise<RegisteredAgent> {

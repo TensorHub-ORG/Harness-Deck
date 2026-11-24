@@ -79,6 +79,7 @@ export class QqBridgeDaemon {
   private readonly lastProgressNotifyAt = new Map<string, number>();
   private pollTimer: NodeJS.Timeout | null = null;
   private unsubWs: (() => void) | null = null;
+  private lastNetErrLogAt = 0;
 
   constructor(private readonly options: QqBridgeOptions) {
     this.log = options.logger ?? ((m) => console.error(`[qq-bridge:${options.profile}] ${m}`));
@@ -90,9 +91,18 @@ export class QqBridgeDaemon {
     this.onebot = new OneBotClient({
       wsUrl: options.napcatWsUrl,
       accessToken: options.napcatToken,
-      onEvent: (ev) => void this.handleQqEvent(ev),
+      onEvent: (ev) => {
+        void this.handleQqEvent(ev).catch((err) => this.logTransientError("qq-event", err));
+      },
       onDisconnect: (reason) => this.log(`WATCHDOG ALERT: NapCat disconnected (${reason}). Retrying...`),
     });
+  }
+
+  private logTransientError(scope: string, err: unknown): void {
+    const now = Date.now();
+    if (now - this.lastNetErrLogAt < 30_000) return;
+    this.lastNetErrLogAt = now;
+    this.log(`Transient ${scope} error (will retry): ${err instanceof Error ? err.message : String(err)}`);
   }
 
   private loadPersonaText(personaFile?: string): string {
@@ -139,15 +149,15 @@ export class QqBridgeDaemon {
 
     if (this.options.mailroom.subscribeEnvelopes) {
       this.unsubWs = this.options.mailroom.subscribeEnvelopes(this.options.agentId, (env) => {
-        void this.handleMailroomEnvelope(env);
+        void this.handleMailroomEnvelope(env).catch((err) => this.logTransientError("ws-envelope", err));
       });
     }
 
     this.pollTimer = setInterval(() => {
-      void this.pollMailroom();
-      void this.options.mailroom.heartbeat(this.options.agentId);
+      void this.pollMailroom().catch((err) => this.logTransientError("poll", err));
+      void this.options.mailroom.heartbeat(this.options.agentId).catch((err) => this.logTransientError("heartbeat", err));
     }, 3000);
-    await this.pollMailroom();
+    await this.pollMailroom().catch((err) => this.logTransientError("initial-poll", err));
   }
 
   public stop(): void {
