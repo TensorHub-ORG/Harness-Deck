@@ -1,274 +1,299 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1080" width="1600" height="1080">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1460 940" width="1460" height="940">
   <defs>
     <style>
-      .bg { fill: #141518; }
-      .grp-body { fill: #181a1f; stroke: #2f333d; stroke-width: 1.2; }
-      .grp-hdr { fill: #1f2228; stroke: #2f333d; stroke-width: 1.2; }
-      .grp-title { fill: #c2c8d4; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 13px; font-weight: 600; }
-      .grp-sub { fill: #7f8797; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 11.5px; font-weight: 400; }
-      .node { fill: #22252d; stroke: #3e424f; stroke-width: 1.2; }
-      .node-subbox { fill: #1d2027; stroke: #363a46; stroke-width: 1.1; }
-      .node-dashed { fill: #1b1e24; stroke: #3c404d; stroke-width: 1.1; stroke-dasharray: 5 4; }
-      .node-title { fill: #eceff4; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 14px; font-weight: 600; }
-      .node-sub { fill: #8f96a6; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 11.5px; }
-      .tier-pill { fill: #2c303b; stroke: #4c5263; stroke-width: 1; }
-      .tier-text { fill: #d5dae5; font-family: "Consolas", "JetBrains Mono", monospace; font-size: 11px; font-weight: 700; }
-      .edge-solid { fill: none; stroke: #6a7180; stroke-width: 1.4; }
-      .edge-dashed { fill: none; stroke: #606775; stroke-width: 1.3; stroke-dasharray: 5 4; }
-      .edge-pill { fill: #16181d; stroke: #2d313b; stroke-width: 1; }
-      .edge-label { fill: #b3b9c6; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 11.5px; }
-      .wall-pill { fill: #21191b; stroke: #5f3439; stroke-width: 1.1; }
-      .wall-label { fill: #d4949a; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 11.5px; font-weight: 600; }
-      .footer-bar { fill: #1c1f26; stroke: #323642; stroke-width: 1; }
-      .footer-text { fill: #8f96a6; font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif; font-size: 12px; }
+      .title-main {
+        font-family: "Segoe Print", "YouYuan", "Comic Sans MS", cursive, sans-serif;
+        font-size: 27px;
+        font-weight: 700;
+        fill: #1e1e1e;
+      }
+      .title-sub {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 13.5px;
+        fill: #6c757d;
+      }
+      .tier-mark {
+        font-family: "Segoe Print", "Comic Sans MS", cursive, sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+      }
+      .tier-caption {
+        font-family: "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 12px;
+        fill: #868e96;
+      }
+      .grp-lbl {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 13.5px;
+        font-weight: 600;
+        fill: #6c757d;
+        paint-order: stroke;
+        stroke: #ffffff;
+        stroke-width: 7px;
+        stroke-linejoin: round;
+      }
+      .node-title {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 16.5px;
+        font-weight: 700;
+        fill: #1e1e1e;
+      }
+      .node-title-lg {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        fill: #1e1e1e;
+      }
+      .node-title-sm {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 15.5px;
+        font-weight: 700;
+        fill: #1e1e1e;
+      }
+      .node-sub {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 12.8px;
+        fill: #495057;
+      }
+      .node-sub-sm {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 12px;
+        fill: #6c757d;
+      }
+      .node-accent-purple {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 12.5px;
+        font-weight: 600;
+        fill: #5f3dc4;
+      }
+      .arrow-lbl {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 12.8px;
+        fill: #343a40;
+        paint-order: stroke;
+        stroke: #ffffff;
+        stroke-width: 5px;
+        stroke-linejoin: round;
+      }
+      .arrow-lbl-muted {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 12.5px;
+        fill: #6c757d;
+        paint-order: stroke;
+        stroke: #ffffff;
+        stroke-width: 5px;
+        stroke-linejoin: round;
+      }
+      .arrow-lbl-green {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        fill: #2b8a3e;
+        paint-order: stroke;
+        stroke: #fafdfb;
+        stroke-width: 5px;
+        stroke-linejoin: round;
+      }
+      .red-note {
+        font-family: "Segoe Print", "YouYuan", "Microsoft YaHei", sans-serif;
+        font-size: 13.5px;
+        font-weight: 700;
+        fill: #e03131;
+        paint-order: stroke;
+        stroke: #ffffff;
+        stroke-width: 5px;
+        stroke-linejoin: round;
+      }
+      .footnote {
+        font-family: "Segoe Print", "Consolas", monospace;
+        font-size: 12px;
+        fill: #868e96;
+      }
+      .footnote-right {
+        font-family: "Segoe Print", "Consolas", monospace;
+        font-size: 12px;
+        fill: #adb5bd;
+      }
     </style>
-
-    <marker id="arrow-end" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
-      <path d="M 1 1.5 L 9 5 L 1 8.5 z" fill="#8d94a3" />
-    </marker>
-    <marker id="arrow-start" viewBox="0 0 10 10" refX="1.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
-      <path d="M 9 1.5 L 1 5 L 9 8.5 z" fill="#8d94a3" />
-    </marker>
-    <marker id="arrow-dashed-end" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M 1 1.5 L 9 5 L 1 8.5 z" fill="#7c8392" />
-    </marker>
   </defs>
 
-  <!-- Background Canvas -->
-  <rect class="bg" x="0" y="0" width="1600" height="1080" />
-
-  <!-- =================================================================== -->
-  <!-- ROW 1: HUMAN COMMAND & EXTERNAL PUBLIC  |  UNIVERSAL BUNDLE ASSETS  -->
-  <!-- =================================================================== -->
-
-  <!-- Left Group: Human Command & Public -->
-  <rect class="grp-body" x="40" y="28" width="960" height="126" rx="3" />
-  <rect class="grp-hdr" x="40" y="28" width="960" height="30" rx="3" />
-  <text class="grp-title" x="56" y="48">人类指挥与外部公域</text>
-  <text class="grp-sub" x="984" y="47.5" text-anchor="end">T0 最高人类授权 · 外部社区输入默认不可信</text>
-
-  <!-- Node: Boss T0 -->
-  <rect class="node" x="64" y="74" width="440" height="62" rx="3" />
-  <rect class="tier-pill" x="80" y="86" width="32" height="19" rx="2" />
-  <text class="tier-text" x="96" y="99.5" text-anchor="middle">T0</text>
-  <text class="node-title" x="122" y="100">老板 · 核心维护者（QQ 私聊 / 真实使用中的 Agent）</text>
-  <text class="node-sub" x="80" y="122">目标下达 · L3 短码审批（批准 A-xxxx / 授权）· 验收与退回返工</text>
-
-  <!-- Node: Community Group -->
-  <rect class="node" x="536" y="74" width="440" height="62" rx="3" />
-  <text class="node-title" x="756" y="100" text-anchor="middle">TensorHub 社区 QQ 交流群（外部不可信输入）</text>
-  <text class="node-sub" x="756" y="122" text-anchor="middle">日常提问 · Bug / 需求反馈 · 社区二开线索 · 发版后回访</text>
-
-  <!-- Right Group: Harness-Deck Universal Bundle Assets -->
-  <rect class="grp-body" x="1040" y="28" width="520" height="126" rx="3" />
-  <rect class="grp-hdr" x="1040" y="28" width="520" height="30" rx="3" />
-  <text class="grp-title" x="1056" y="48">Harness-Deck 整合包资产</text>
-  <text class="grp-sub" x="1544" y="47.5" text-anchor="end">任意 Agent 解包可读</text>
-
-  <!-- Node: Bundle Skills -->
-  <rect class="node" x="1064" y="74" width="472" height="62" rx="3" />
-  <text class="node-title" x="1300" y="100" text-anchor="middle">START_HERE.md + 6 个模块化 Skill + 部署套件</text>
-  <text class="node-sub" x="1300" y="122" text-anchor="middle">0基础交互问询向导 · 断点续装 · 本地 / SSH 双分支 · O1 / K1 / 工程师 SOP</text>
-
-  <!-- =================================================================== -->
-  <!-- ROW 2: QQ EDGE LAYER (COOMI O1 T1  |  COOMI K1 T3)                  -->
-  <!-- =================================================================== -->
-  <rect class="grp-body" x="40" y="226" width="960" height="136" rx="3" />
-  <rect class="grp-hdr" x="40" y="226" width="960" height="30" rx="3" />
-  <text class="grp-title" x="56" y="246">QQ 边缘交互层</text>
-  <text class="grp-sub" x="520" y="245.5" text-anchor="middle">Qmmi / NapCat OneBot v11 · 推荐独立双号防风控</text>
-
-  <!-- Node: Coomi O1 (T1) -->
-  <rect class="node" x="64" y="274" width="420" height="70" rx="3" />
-  <rect class="tier-pill" x="80" y="287" width="32" height="19" rx="2" />
-  <text class="tier-text" x="96" y="300.5" text-anchor="middle">T1</text>
-  <text class="node-title" x="122" y="301">库米 O1 · Coomi O1（秘书主管）</text>
-  <text class="node-sub" x="80" y="325">理工女 1v1 纯文本人设 · LLM 调度大脑 · 防注入审查隔离阀</text>
-
-  <!-- Center vertical dashed divider between O1 & K1 -->
-  <line x1="520" y1="274" x2="520" y2="344" stroke="#3c404d" stroke-width="1.2" stroke-dasharray="4 3" />
-
-  <!-- Node: Coomi K1 (T3) -->
-  <rect class="node" x="556" y="274" width="420" height="70" rx="3" />
-  <rect class="tier-pill" x="572" y="287" width="32" height="19" rx="2" />
-  <text class="tier-text" x="588" y="300.5" text-anchor="middle">T3</text>
-  <text class="node-title" x="614" y="301">库米 K1 · Coomi K1（公域前线）</text>
-  <text class="node-sub" x="572" y="325">只读知识库答疑 · 结构化采集反馈 · 禁越级联 T0 / 禁触达 T2</text>
-
-  <!-- =================================================================== -->
-  <!-- ROW 3: HDP v1 PROTOCOL & DUAL-MODE MAILROOM                         -->
-  <!-- =================================================================== -->
-  <rect class="grp-body" x="40" y="438" width="1220" height="184" rx="3" />
-  <rect class="grp-hdr" x="40" y="438" width="1220" height="30" rx="3" />
-  <text class="grp-title" x="56" y="458">Harness-Deck 收发室层</text>
-  <text class="grp-sub" x="1244" y="457.5" text-anchor="end">HDP v1 核心协议 · 极简可插拔传输 · 零重型中台</text>
-
-  <!-- Top Span: Deck Mailroom Core -->
-  <rect class="node" x="64" y="484" width="1172" height="50" rx="3" />
-  <text class="node-title" x="650" y="514" text-anchor="middle">Deck Mailroom（HDP v1 协议校验 / T0&gt;T1&gt;T2&gt;T3 硬路由 / L3 SQLite 持久化审批 / 密钥脱敏 / max_hops 熔断 / trace_id 审计）</text>
-
-  <!-- Internal vertical stems from Mailroom Core down to 3 capability sub-boxes -->
-  <line class="edge-solid" x1="251" y1="534" x2="251" y2="556" />
-  <line class="edge-solid" x1="650" y1="534" x2="650" y2="556" />
-  <line class="edge-solid" x1="1049" y1="534" x2="1049" y2="556" />
-
-  <!-- Sub-box 1: Mode A (aligned directly above MCP direct link x=251) -->
-  <rect class="node-subbox" x="64" y="556" width="374" height="50" rx="3" />
-  <text class="node-title" x="251" y="577" text-anchor="middle" style="font-size:13px;">模式 A：同机零服务模式</text>
-  <text class="node-sub" x="251" y="596" text-anchor="middle">file:// 本地 node:sqlite + 共享目录，零独立进程</text>
-
-  <!-- Sub-box 2: Artifact & KB (centered above T2 ↮ T3 firewall callout) -->
-  <rect class="node-subbox" x="463" y="556" width="374" height="50" rx="3" />
-  <text class="node-title" x="650" y="577" text-anchor="middle" style="font-size:13px;">工件中转 &amp; 轻量知识/反馈库</text>
-  <text class="node-sub" x="650" y="596" text-anchor="middle">SHA256 文件中转（PDF/日志/APK）· 只读 KB · 反馈账本</text>
-
-  <!-- Sub-box 3: Mode B (aligned directly above WS/SSH tunnel x=1010) -->
-  <rect class="node-subbox" x="862" y="556" width="374" height="50" rx="3" />
-  <text class="node-title" x="1049" y="577" text-anchor="middle" style="font-size:13px;">模式 B：跨端轻量 deck-relay</text>
-  <text class="node-sub" x="1049" y="596" text-anchor="middle">VPS ~23MB 原生 systemd + SSH 加密隧道 / 出站 WS</text>
-
-  <!-- =================================================================== -->
-  <!-- ROW 4: T2 INTERNAL EXECUTION LAYER (DESKTOP ENGINEERS & PIPELINES)  -->
-  <!-- =================================================================== -->
-  <rect class="grp-body" x="40" y="700" width="1520" height="348" rx="3" />
-  <rect class="grp-hdr" x="40" y="700" width="1520" height="30" rx="3" />
-  <text class="grp-title" x="56" y="720">内网执行层 · T2</text>
-  <text class="grp-sub" x="1544" y="719.5" text-anchor="end">个人电脑 / 多 CLI 引擎 · 严格项目目录白名单 &amp; Git Worktree 强制隔离</text>
-
-  <!-- Top Row inside T2: MCP Suite | Deck Dispatcher | Adapters & Packs -->
-  <rect class="node" x="64" y="746" width="510" height="62" rx="3" />
-  <text class="node-title" x="319" y="772" text-anchor="middle">通用 MCP 套件（按 T0-T3 角色动态暴露工具）</text>
-  <text class="node-sub" x="319" y="794" text-anchor="middle">deck-comm · deck-dispatch · deck-qq · deck-kb</text>
-
-  <rect class="node" x="610" y="746" width="600" height="62" rx="3" />
-  <rect class="tier-pill" x="626" y="758" width="32" height="19" rx="2" />
-  <text class="tier-text" x="642" y="771.5" text-anchor="middle">T2</text>
-  <text class="node-title" x="668" y="772">桌面工长 · Deck Dispatcher（多 CLI 调度与监护）</text>
-  <text class="node-sub" x="626" y="794">工位注册 · Git Worktree 隔离 · 3档沙箱 · Windows .cmd 解包 · 超时强杀与兜底捕获</text>
-
-  <!-- Dashed plugin/pack link between Dispatcher and Adapters/Packs -->
-  <line class="edge-dashed" x1="1210" y1="777" x2="1242" y2="777" />
-
-  <rect class="node-dashed" x="1244" y="746" width="292" height="62" rx="3" />
-  <text class="node-title" x="1390" y="772" text-anchor="middle" style="font-size:13px;">可选深度适配 &amp; 业务管线槽</text>
-  <text class="node-sub" x="1390" y="794" text-anchor="middle">adapters/dsh-plugin · packs/*</text>
-
-  <!-- Dual Horizontal Bus Rails inside T2 (ZERO stem crossing + crisp bridge halos) -->
-  <!-- 1. Dashed MCP Callback Bus drawn first (stem at x=156 left of solid bus x=192) -->
-  <path class="edge-dashed" d="M 156 808 L 156 898" marker-end="url(#arrow-dashed-end)" />
-  <path class="edge-dashed" d="M 156 868 L 1401 868" />
-  <path class="edge-dashed" d="M 405 868 L 405 898" marker-end="url(#arrow-dashed-end)" />
-  <path class="edge-dashed" d="M 654 868 L 654 898" marker-end="url(#arrow-dashed-end)" />
-  <path class="edge-dashed" d="M 903 868 L 903 898" marker-end="url(#arrow-dashed-end)" />
-  <path class="edge-dashed" d="M 1152 868 L 1152 898" marker-end="url(#arrow-dashed-end)" />
-  <path class="edge-dashed" d="M 1401 868 L 1401 898" marker-end="url(#arrow-dashed-end)" />
-
-  <!-- 2. Subtle dark bridge cutouts where solid drops pass over the dashed horizontal rail -->
-  <line x1="192" y1="862" x2="192" y2="874" stroke="#181a1f" stroke-width="6" />
-  <line x1="441" y1="862" x2="441" y2="874" stroke="#181a1f" stroke-width="6" />
-  <line x1="690" y1="862" x2="690" y2="874" stroke="#181a1f" stroke-width="6" />
-  <line x1="939" y1="862" x2="939" y2="874" stroke="#181a1f" stroke-width="6" />
-  <line x1="1188" y1="862" x2="1188" y2="874" stroke="#181a1f" stroke-width="6" />
-
-  <!-- 3. Solid Dispatch Bus from Deck Dispatcher (x=910, y=808) -->
-  <path class="edge-solid" d="M 910 808 L 910 840" />
-  <path class="edge-solid" d="M 192 840 L 1437 840" />
-  <path class="edge-solid" d="M 192 840 L 192 898" marker-end="url(#arrow-end)" />
-  <path class="edge-solid" d="M 441 840 L 441 898" marker-end="url(#arrow-end)" />
-  <path class="edge-solid" d="M 690 840 L 690 898" marker-end="url(#arrow-end)" />
-  <path class="edge-solid" d="M 939 840 L 939 898" marker-end="url(#arrow-end)" />
-  <path class="edge-solid" d="M 1188 840 L 1188 898" marker-end="url(#arrow-end)" />
-  <path class="edge-solid" d="M 1437 840 L 1437 898" marker-end="url(#arrow-end)" />
-
-  <!-- Bus Pill Labels seated directly ON their respective bus rails -->
-  <rect class="edge-pill" x="742" y="828" width="116" height="24" rx="3" />
-  <text class="edge-label" x="800" y="844" text-anchor="middle">工单派发总线</text>
-  <rect class="edge-pill" x="206" y="856" width="186" height="24" rx="3" />
-  <text class="edge-label" x="299" y="872" text-anchor="middle">桌面 Agent 共用 MCP 回报通道</text>
-
-  <!-- 6 Symmetrical CLI Engineer Cards (y = 900 .. 972, w = 226, gap = 23) -->
-  <!-- Card 1: dsh CLI -->
-  <rect class="node" x="64" y="900" width="226" height="72" rx="3" />
-  <text class="node-title" x="177" y="929" text-anchor="middle">dsh CLI</text>
-  <text class="node-sub" x="177" y="952" text-anchor="middle">headless --json · 首个适配参考</text>
-
-  <!-- Card 2: agy CLI -->
-  <rect class="node" x="313" y="900" width="226" height="72" rx="3" />
-  <text class="node-title" x="426" y="929" text-anchor="middle">agy CLI</text>
-  <text class="node-sub" x="426" y="952" text-anchor="middle">--print --mode · 实测打通</text>
-
-  <!-- Card 3: claude CLI -->
-  <rect class="node" x="562" y="900" width="226" height="72" rx="3" />
-  <text class="node-title" x="675" y="929" text-anchor="middle">claude CLI</text>
-  <text class="node-sub" x="675" y="952" text-anchor="middle">-p stream-json · --resume</text>
-
-  <!-- Card 4: codex CLI -->
-  <rect class="node" x="811" y="900" width="226" height="72" rx="3" />
-  <text class="node-title" x="924" y="929" text-anchor="middle">codex CLI</text>
-  <text class="node-sub" x="924" y="952" text-anchor="middle">exec --json --sandbox</text>
-
-  <!-- Card 5: zcode / coomi -->
-  <rect class="node" x="1060" y="900" width="226" height="72" rx="3" />
-  <text class="node-title" x="1173" y="929" text-anchor="middle">zcode / coomi CLI</text>
-  <text class="node-sub" x="1173" y="952" text-anchor="middle">内置驱动 · 统一隔离调度</text>
-
-  <!-- Card 6: custom-cli -->
-  <rect class="node-dashed" x="1309" y="900" width="227" height="72" rx="3" />
-  <text class="node-title" x="1422.5" y="929" text-anchor="middle">custom-cli 扩展</text>
-  <text class="node-sub" x="1422.5" y="952" text-anchor="middle">YAML 命令模板接入任意新 CLI</text>
-
-  <!-- Bottom Tooling & Pipeline Strip -->
-  <rect class="footer-bar" x="64" y="994" width="1472" height="36" rx="3" />
-  <text class="footer-text" x="800" y="1016.5" text-anchor="middle">
-    统一工具链 deck CLI（scan / init / deploy-ssh / doctor / trace / mock）  ·  后期按需挂载 packs/（GitHub 二开巡检 / 官网前端发布 / 反馈看板同步 / 聚合 API 预留槽）
-  </text>
-
-  <!-- =================================================================== -->
-  <!-- INTER-LAYER ORTHOGONAL CONNECTORS & EDGE LABELS (ZERO CROSSINGS)    -->
-  <!-- =================================================================== -->
-
-  <!-- 1. Boss (T0) <-> Coomi O1 (T1) -->
-  <path class="edge-solid" d="M 274 138 L 274 272" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-  <rect class="edge-pill" x="169" y="178" width="210" height="24" rx="3" />
-  <text class="edge-label" x="274" y="194" text-anchor="middle">私聊指令 / L3 审批 / 简报与文件</text>
-
-  <!-- 2. Community Group <-> Coomi K1 (T3) -->
-  <path class="edge-solid" d="M 766 138 L 766 272" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-  <rect class="edge-pill" x="668" y="178" width="196" height="24" rx="3" />
-  <text class="edge-label" x="766" y="194" text-anchor="middle">群内答疑 / 反馈收集 / 闭环回访</text>
-
-  <!-- 3. Bundle Assets -> QQ Edge Layer (dashed elbow) -->
-  <path class="edge-dashed" d="M 1185 154 L 1185 294 L 1002 294" marker-end="url(#arrow-dashed-end)" />
-  <rect class="edge-pill" x="1086" y="218" width="198" height="24" rx="3" />
-  <text class="edge-label" x="1185" y="234" text-anchor="middle">按需引导本地或 SSH 服务器部署</text>
-
-  <!-- 4. Bundle Assets -> T2 Execution Layer (clean right express lane x=1440) -->
-  <path class="edge-dashed" d="M 1440 154 L 1440 698" marker-end="url(#arrow-dashed-end)" />
-  <rect class="edge-pill" x="1328" y="420" width="224" height="24" rx="3" />
-  <text class="edge-label" x="1440" y="436" text-anchor="middle">任意 Agent 读教程自动问询配置</text>
-
-  <!-- 5. Coomi O1 (T1) <-> Deck Mailroom -->
-  <path class="edge-solid" d="M 274 346 L 274 482" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-  <rect class="edge-pill" x="150" y="388" width="248" height="24" rx="3" />
-  <text class="edge-label" x="274" y="404" text-anchor="middle">T1 令牌：派单 / 读简报 / 发指令 / 工件</text>
-
-  <!-- 6. Coomi K1 (T3) <-> Deck Mailroom -->
-  <path class="edge-solid" d="M 766 346 L 766 482" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-  <rect class="edge-pill" x="634" y="388" width="264" height="24" rx="3" />
-  <text class="edge-label" x="766" y="404" text-anchor="middle">T3 令牌：仅结构化上报 &amp; 收 T1 下发指令</text>
-
-  <!-- 7. Deck Mailroom <-> MCP Suite (left channel x=251) -->
-  <path class="edge-solid" d="M 251 624 L 251 744" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-  <rect class="edge-pill" x="164" y="650" width="174" height="24" rx="3" />
-  <text class="edge-label" x="251" y="666" text-anchor="middle">MCP 工具直连（T2 令牌）</text>
-
-  <!-- 8. Hard Isolation Firewall Callout (centered between x=251 and x=1010 -> x=630) -->
-  <rect class="wall-pill" x="462" y="649" width="336" height="26" rx="3" />
-  <text class="wall-label" x="630" y="666.5" text-anchor="middle">✕ 硬权限隔离：T2 内网执行 ↮ T3 公域前线 严禁直连</text>
-
-  <!-- 9. Deck Mailroom (Mode B) <-> Deck Dispatcher (right channel x=1010) -->
-  <path class="edge-solid" d="M 1010 624 L 1010 744" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
-  <rect class="edge-pill" x="896" y="650" width="228" height="24" rx="3" />
-  <text class="edge-label" x="1010" y="666" text-anchor="middle">出站 WS / SSH 隧道（免桌面公网 IP）</text>
-
+  <rect x="0" y="0" width="1460" height="940" fill="#ffffff" />
+  <text x="52" y="54" class="title-main" text-anchor="start" >Harness-Deck</text>
+  <path d="M 49.05 63.39 C 112.84 64.81, 175.21 63.19, 232.4 61.24 M 50.13 62.87 C 110.09 61.29, 170.43 61.71, 232.09 60.8" fill="none" stroke="#fab005" stroke-width="3.2" stroke-linecap="round" opacity="0.78" />
+  <text x="54" y="83" class="title-sub" text-anchor="start" >连接并驾驭 · HDP v1 极简架构</text>
+  <text x="78" y="152" class="tier-mark" text-anchor="middle" fill="#d97706">T0</text>
+  <text x="78" y="171" class="tier-caption" text-anchor="middle" >人类授权</text>
+  <text x="78" y="336" class="tier-mark" text-anchor="middle" fill="#1971c2">T1 / T3</text>
+  <text x="78" y="355" class="tier-caption" text-anchor="middle" >QQ 边缘</text>
+  <text x="78" y="526" class="tier-mark" text-anchor="middle" fill="#6741d9">HDP v1</text>
+  <text x="78" y="545" class="tier-caption" text-anchor="middle" >收发室</text>
+  <text x="78" y="766" class="tier-mark" text-anchor="middle" fill="#2b8a3e">T2</text>
+  <text x="78" y="785" class="tier-caption" text-anchor="middle" >本地执行</text>
+  <path d="M 121.26 108.75 C 121.2 355.87, 121.45 666.64, 121.21 887.28 M 121.81 107.99 C 121.3 359.39, 122.2 652.03, 122.29 888.28" fill="none" stroke="#e9ecef" stroke-width="1.6" stroke-dasharray="6 8" stroke-linecap="round" />
+  <rect x="148" y="266" width="816" height="146" rx="18" fill="#fafbfc" stroke="none" />
+  <path d="M 165.85 266.46 Q 555.51 265.92, 944.95 266.11 Q 963.62 266.01, 963.36 284.87 Q 963.13 338.61, 963.63 392.94 Q 963.73 411.04, 944.95 411.35 Q 554.96 411.64, 165.85 411.75 Q 147.69 411.64, 147.43 392.94 Q 147.36 338.31, 147.1 284.87 Q 147.41 266.55, 165.57 266.84" fill="none" stroke="#adb5bd" stroke-width="1.6" stroke-dasharray="9 7" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="554" y="272" class="grp-lbl" text-anchor="middle" >QQ 边缘层 · NapCat / OneBot</text>
+  <rect x="148" y="644" width="1252" height="248" rx="20" fill="#fafdfb" stroke="none" />
+  <path d="M 169.16 644.66 Q 774.77 644.77, 1379.19 644.57 Q 1399.67 645.08, 1399.94 665.41 Q 1400.95 767.95, 1399.43 871.8 Q 1400.31 892.88, 1379.19 892.55 Q 773.52 891.73, 169.16 892 Q 148.53 892.53, 148.41 871.8 Q 148.41 768.94, 148.48 665.41 Q 148.7 644.19, 168.64 644.09" fill="none" stroke="#adb5bd" stroke-width="1.6" stroke-dasharray="9 7" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="166" y="650" class="grp-lbl" text-anchor="start" >本地执行层 · T2</text>
+  <text x="1020" y="650" class="grp-lbl" text-anchor="middle" >项目白名单 &amp; Git Worktree 隔离</text>
+  <rect x="174" y="108" width="294" height="82" rx="14" fill="#fff9db" stroke="none" />
+  <clipPath id="clip_boss"><rect x="176" y="110" width="290" height="78" rx="12" /></clipPath>
+  <path d="M 96.82 194 Q 133.67 149.67, 171.87 104 M 105.95 194 Q 144.46 148.75, 181.5 104 M 116.22 194 Q 154.63 150, 192.05 104 M 126.53 194 Q 162.79 149.61, 200.77 104 M 135.47 194 Q 172.98 148.29, 210.85 104 M 145.5 194 Q 182.96 149.74, 220.56 104 M 155.76 194 Q 193.49 147.86, 232.15 104 M 165.86 194 Q 203.05 149.36, 242.3 104 M 176.33 194 Q 213.76 147.88, 250.81 104 M 186.58 194 Q 223.1 149.66, 262.36 104 M 196.5 194 Q 232.71 148.08, 270.97 104 M 205.52 194 Q 243.69 148.7, 281.93 104 M 215.06 194 Q 252.6 148.81, 290.83 104 M 225.66 194 Q 263.07 150.13, 300.65 104 M 235.69 194 Q 273.11 149.09, 311 104 M 245.1 194 Q 282.94 149.82, 321.49 104 M 255.35 194 Q 293.85 149.22, 330.88 104 M 266.23 194 Q 302.54 148.51, 340.55 104 M 275.36 194 Q 314.01 149.41, 351.72 104 M 286.47 194 Q 323.74 149.08, 360.8 104 M 296.73 194 Q 333.89 149.2, 371.98 104 M 306.83 194 Q 343.65 148.06, 381.18 104 M 316.05 194 Q 353.2 148.57, 391.79 104 M 326.2 194 Q 363.33 148.3, 402.11 104 M 336.38 194 Q 372.52 148.71, 412.35 104 M 346.73 194 Q 384.87 149.23, 421.98 104 M 356.98 194 Q 392.55 149.65, 431.4 104 M 366.42 194 Q 404.61 149.47, 441.67 104 M 375.16 194 Q 413.41 150.13, 451.19 104 M 385.42 194 Q 424.38 148.64, 462.14 104 M 395.82 194 Q 434.4 149.55, 471.13 104 M 406.56 194 Q 443.48 148.23, 481.11 104 M 416.35 194 Q 453.46 147.96, 491.35 104 M 425.85 194 Q 464.77 149.2, 500.68 104 M 436.32 194 Q 473.41 149.26, 510.73 104 M 445.63 194 Q 484.15 148.2, 521.09 104 M 455.25 194 Q 494.63 149.35, 532.41 104 M 465.84 194 Q 503.95 149.61, 541.35 104 M 476.83 194 Q 514.57 149.66, 550.47 104 M 486.06 194 Q 522.9 147.89, 561.35 104 M 496.43 194 Q 534.55 148.98, 571.92 104 M 505.49 194 Q 543.11 149.65, 580.87 104 M 516.22 194 Q 554 149.13, 591.05 104 M 526.7 194 Q 564.9 149.1, 600.93 104 M 535.53 194 Q 574.37 149.3, 612.21 104 M 545.82 194 Q 584.68 148.33, 620.63 104" clip-path="url(#clip_boss)" fill="none" stroke="#ffe066" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 186.78 108.67 Q 320.45 108.43, 454.65 109.25 Q 467.61 108.1, 468.05 122.07 Q 469 149.92, 467.74 177.17 Q 468.41 191.06, 454.65 190.57 Q 321.39 189.68, 186.78 190.47 Q 173.9 190.55, 173.38 177.17 Q 174.17 148.85, 172.77 122.07 Q 173.17 108.38, 187.3 108.95" fill="none" stroke="#1e1e1e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 188.17 107.4 Q 321.29 107.01, 454.58 107.22 Q 468.39 107.31, 468.4 121.21 Q 468.17 148.4, 468.33 175.84 Q 468.24 189.95, 454.58 189.65 Q 321.98 189.69, 188.17 189.47 Q 174.72 189.4, 174.35 175.84 Q 174.87 148.41, 174.53 121.21 Q 174.5 107.38, 187.91 107.13" fill="none" stroke="#1e1e1e" stroke-width="1.37" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />
+  <text x="321" y="144" class="node-title" text-anchor="middle" >老板 · Boss (T0)</text>
+  <text x="321" y="169" class="node-sub" text-anchor="middle" >QQ 私聊 · L3 短码审批</text>
+  <rect x="640" y="108" width="294" height="82" rx="14" fill="#fff5f5" stroke="none" />
+  <clipPath id="clip_community"><rect x="642" y="110" width="290" height="78" rx="12" /></clipPath>
+  <path d="M 562.62 194 Q 599.49 148.67, 637.13 104 M 572.41 194 Q 610.08 149.64, 646.66 104 M 582.38 194 Q 618.61 149.4, 658.28 104 M 591.39 194 Q 630.72 147.9, 667.02 104 M 602.46 194 Q 639.34 149.82, 676.55 104 M 612.36 194 Q 648.67 149.44, 687.32 104 M 621.72 194 Q 660.8 149.75, 698.05 104 M 632.44 194 Q 670.18 148.29, 707.77 104 M 642.63 194 Q 678.57 148.82, 718.03 104 M 652.72 194 Q 690.08 148.84, 728.39 104 M 662.52 194 Q 699.41 148.5, 738.37 104 M 671.92 194 Q 709.78 148.66, 747.38 104 M 682.99 194 Q 719.48 147.96, 757.17 104 M 691.05 194 Q 729.12 149.85, 767.18 104 M 701.62 194 Q 740.21 148.43, 777.68 104 M 711.5 194 Q 750.11 149.12, 788.17 104 M 721.62 194 Q 760.11 149.85, 797.06 104 M 731.75 194 Q 769.75 148.26, 808.19 104 M 741.64 194 Q 778.96 148.37, 817.62 104 M 752.23 194 Q 788.84 149, 826.47 104 M 761.18 194 Q 800.39 150.06, 837.03 104 M 771.81 194 Q 810.71 149.02, 846.74 104 M 781.35 194 Q 820.74 148.61, 858.33 104 M 792.68 194 Q 829.62 148.38, 866.51 104 M 802.8 194 Q 838.74 149.27, 877.77 104 M 812.95 194 Q 849 149.61, 888.05 104 M 821.21 194 Q 860.87 149.49, 897.33 104 M 832.19 194 Q 868.7 149.06, 906.8 104 M 841.12 194 Q 878.54 148.25, 917.76 104 M 852.02 194 Q 889.31 149.29, 927.05 104 M 861.25 194 Q 899.6 148.96, 938.08 104 M 871.5 194 Q 909.69 149.65, 946.46 104 M 882.04 194 Q 920.9 149.42, 956.5 104 M 892.19 194 Q 930.4 148.69, 968.36 104 M 902.04 194 Q 939.63 149.35, 978.1 104 M 911.89 194 Q 949.68 148.32, 987.93 104 M 922.83 194 Q 958.9 149.93, 996.65 104 M 932.07 194 Q 970.48 148.76, 1007.6 104 M 941.28 194 Q 979.96 147.91, 1016.68 104 M 951.14 194 Q 990.91 149.01, 1026.48 104 M 962.72 194 Q 999.47 148.64, 1036.78 104 M 972.85 194 Q 1009.11 147.96, 1048.18 104 M 981.84 194 Q 1018.99 149.98, 1056.79 104 M 992.5 194 Q 1030.69 147.96, 1066.53 104 M 1002.03 194 Q 1039.55 149.14, 1077.88 104 M 1011.82 194 Q 1049.12 149.83, 1086.9 104" clip-path="url(#clip_community)" fill="none" stroke="#ffc9c9" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 653.35 107.52 Q 786.65 108.65, 919.84 107.25 Q 933.1 107.65, 933.59 121.27 Q 934.5 149.45, 933.38 176.94 Q 933.74 191.03, 919.84 190.69 Q 786.47 191.48, 653.35 190.87 Q 640.03 190.13, 639.6 176.94 Q 639.12 148.24, 639.9 121.27 Q 639.18 107.44, 653.14 106.84" fill="none" stroke="#1e1e1e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 654.77 107.86 Q 786.7 107.65, 919.3 107.99 Q 933.49 107.87, 933.83 122.39 Q 934.04 149.07, 933.95 175.53 Q 933.43 190.31, 919.3 190.06 Q 786.79 189.61, 654.77 189.84 Q 640.66 190.42, 640.23 175.53 Q 640.19 148.86, 639.87 122.39 Q 640.41 108.03, 655.22 107.46" fill="none" stroke="#1e1e1e" stroke-width="1.37" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />
+  <text x="787" y="144" class="node-title" text-anchor="middle" >TensorHub 社区 QQ 群</text>
+  <text x="787" y="169" class="node-sub" text-anchor="middle" >外部提问 · Bug 反馈</text>
+  <rect x="1094" y="112" width="300" height="106" rx="15" fill="#f8f9fa" stroke="none" />
+  <clipPath id="clip_skills"><rect x="1096" y="114" width="296" height="102" rx="13" /></clipPath>
+  <path d="M 992.84 222 Q 1039.63 165.96, 1089.07 108 M 1002.37 222 Q 1051.85 165.48, 1100.27 108 M 1014.78 222 Q 1062.54 164.29, 1110.99 108 M 1024.6 222 Q 1073.46 164.83, 1122.12 108 M 1035.79 222 Q 1083.75 166.1, 1133.16 108 M 1046.95 222 Q 1096.93 164.22, 1143.66 108 M 1058.93 222 Q 1107.49 165.54, 1155.6 108 M 1068.63 222 Q 1116.58 165.91, 1166.03 108 M 1080.76 222 Q 1128.43 165.6, 1177.56 108 M 1090.11 222 Q 1140.08 165.94, 1189.39 108 M 1101.16 222 Q 1150.54 165.45, 1198.67 108 M 1112.07 222 Q 1162.51 164.74, 1210.38 108 M 1123.72 222 Q 1173.04 165.01, 1221.17 108 M 1135.33 222 Q 1183.26 164.38, 1232.39 108 M 1146.17 222 Q 1195.09 165.5, 1244.12 108 M 1156.62 222 Q 1206.64 165.88, 1255.49 108 M 1168.8 222 Q 1215.59 164.87, 1265 108 M 1178.21 222 Q 1227.79 166.18, 1277.12 108 M 1189.92 222 Q 1238.52 164.09, 1288.47 108 M 1201.41 222 Q 1250.27 164.99, 1297.66 108 M 1211.81 222 Q 1260.6 165.12, 1309.79 108 M 1223.37 222 Q 1271.27 164.44, 1320.68 108 M 1234.38 222 Q 1282.33 164.98, 1331.02 108 M 1244.2 222 Q 1292.56 164.01, 1341.54 108 M 1256.7 222 Q 1304.55 164.06, 1353.33 108 M 1266.56 222 Q 1315.34 164.68, 1364.74 108 M 1278.44 222 Q 1327.74 165.93, 1374.7 108 M 1288.37 222 Q 1338.71 164.73, 1386.81 108 M 1300.92 222 Q 1348.7 165.22, 1398.37 108 M 1311.31 222 Q 1359.7 163.93, 1408.44 108 M 1322.24 222 Q 1369.7 164.2, 1418.91 108 M 1333.74 222 Q 1382.33 165.26, 1429.79 108 M 1344.62 222 Q 1393.43 165.24, 1441.31 108 M 1355.58 222 Q 1404.95 165.04, 1451.69 108 M 1366.51 222 Q 1415.58 165.71, 1463.01 108 M 1376.72 222 Q 1425.94 164.19, 1474.66 108 M 1387.68 222 Q 1437.79 164.06, 1485.54 108 M 1399.01 222 Q 1446.74 165.3, 1496.45 108 M 1409.35 222 Q 1459.32 164.55, 1506.77 108 M 1421.56 222 Q 1469.45 166.15, 1518.31 108 M 1431.94 222 Q 1481.84 166.02, 1529.59 108 M 1442.29 222 Q 1491.82 163.83, 1540.11 108 M 1454.82 222 Q 1503.84 164.38, 1551.05 108 M 1465.86 222 Q 1513.57 164.54, 1562.4 108 M 1476.79 222 Q 1524.72 166.07, 1573.7 108 M 1487.8 222 Q 1536.53 165.24, 1583.58 108 M 1497.92 222 Q 1545.71 165.48, 1595.58 108" clip-path="url(#clip_skills)" fill="none" stroke="#e9ecef" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 1107.96 112.23 Q 1245 113.37, 1380.41 112.56 Q 1394.38 112.6, 1394.71 126.52 Q 1395.75 164.59, 1395.03 204.19 Q 1394.45 218.33, 1380.41 218.48 Q 1244.14 219.14, 1107.96 219.09 Q 1094 218.16, 1093.67 204.19 Q 1092.88 164.87, 1093.35 126.52 Q 1093.25 112.32, 1108.29 111.93" fill="none" stroke="#6c757d" stroke-width="1.7" stroke-dasharray="9 7" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="1244" y="147" class="node-title" text-anchor="middle" fill="#343a40">整合包 Skills</text>
+  <text x="1244" y="173" class="node-sub" text-anchor="middle" >START_HERE · deck-onboarding</text>
+  <text x="1244" y="196" class="node-sub" text-anchor="middle" >deck-pilot 日常驾驭与体检</text>
+  <rect x="174" y="300" width="294" height="86" rx="14" fill="#e7f5ff" stroke="none" />
+  <clipPath id="clip_o1"><rect x="176" y="302" width="290" height="82" rx="12" /></clipPath>
+  <path d="M 91.07 390 Q 131.33 343.94, 171.89 296 M 101.63 390 Q 142.26 342.5, 180.75 296 M 112.66 390 Q 152.34 343.7, 190.12 296 M 121.33 390 Q 160.53 343.07, 200.26 296 M 132.46 390 Q 170.67 342.59, 211.59 296 M 142.49 390 Q 180.67 342.3, 220.37 296 M 152.52 390 Q 192.03 343.7, 231.11 296 M 162.5 390 Q 201.01 342.55, 241.72 296 M 171.23 390 Q 210.38 342.32, 251.32 296 M 181.17 390 Q 221.67 344.17, 260.62 296 M 192.27 390 Q 231.35 343.3, 271.14 296 M 202.56 390 Q 240.44 344.12, 281.62 296 M 211.32 390 Q 251.65 343.94, 291.67 296 M 222.44 390 Q 262.59 342.48, 302 296 M 231.31 390 Q 270.56 342.4, 310.75 296 M 241.76 390 Q 282.74 342.86, 320.9 296 M 252.77 390 Q 291.01 342.52, 331.94 296 M 262.6 390 Q 301 343.42, 340.95 296 M 271.29 390 Q 311.27 342.61, 350.83 296 M 281.74 390 Q 321.68 344.06, 361.7 296 M 291.81 390 Q 330.55 343.07, 371.72 296 M 302.68 390 Q 341.48 344.06, 380.44 296 M 311.64 390 Q 351.15 342.72, 391.97 296 M 322.12 390 Q 362.29 342.22, 401.13 296 M 332.7 390 Q 371.89 342.87, 410.77 296 M 341.35 390 Q 382.39 342.94, 420.55 296 M 352.1 390 Q 390.82 342.55, 432.12 296 M 361.37 390 Q 401.19 343.03, 440.64 296 M 371.4 390 Q 411.89 342.63, 450.48 296 M 382.39 390 Q 420.64 343.81, 460.71 296 M 392.52 390 Q 432.62 343.61, 471.79 296 M 401.68 390 Q 441.21 341.98, 481.5 296 M 411.12 390 Q 451.76 342.19, 491.53 296 M 422.15 390 Q 461.57 342.24, 501.37 296 M 431.7 390 Q 472.12 343.49, 511.72 296 M 442.11 390 Q 480.48 342.43, 521.51 296 M 452.38 390 Q 491.39 342.88, 531.23 296 M 462.63 390 Q 501.89 343.15, 540.94 296 M 471.01 390 Q 511.62 343.15, 550.53 296 M 481.98 390 Q 522.46 342.66, 561.59 296 M 491.73 390 Q 532.73 343.88, 571.76 296 M 501.97 390 Q 541.85 342.06, 581.2 296 M 511.5 390 Q 551.96 343.91, 590.39 296 M 522.2 390 Q 561.44 341.95, 600.19 296 M 532.16 390 Q 572.15 342.75, 610.28 296 M 542.71 390 Q 582.72 343.13, 621.92 296 M 551.2 390 Q 590.69 344.02, 630.23 296" clip-path="url(#clip_o1)" fill="none" stroke="#a5d8ff" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 186.88 300.69 Q 320.5 301.42, 454.43 300.7 Q 468.13 300.49, 467.93 314.2 Q 466.93 344.13, 467.91 372.46 Q 468.04 386.47, 454.43 385.96 Q 320.18 386.69, 186.88 386.33 Q 173.95 386.32, 173.38 372.46 Q 172.64 342.53, 173.94 314.2 Q 173.76 300.67, 186.81 300.13" fill="none" stroke="#1e1e1e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 187.6 300.08 Q 321.39 300.3, 454.55 299.73 Q 468.62 300.11, 468.56 314.09 Q 469.48 343.63, 468.83 372.21 Q 468.87 386.3, 454.55 386.22 Q 320.86 385.89, 187.6 385.98 Q 173.83 386.47, 173.59 372.21 Q 173.87 342.97, 173.86 314.09 Q 173.71 299.9, 187.04 300.47" fill="none" stroke="#1e1e1e" stroke-width="1.37" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />
+  <text x="321" y="337" class="node-title" text-anchor="middle" >库米 O1 · 秘书主管 (T1)</text>
+  <text x="321" y="363" class="node-sub" text-anchor="middle" >纯文本对话 · 派单与简报</text>
+  <rect x="640" y="300" width="294" height="86" rx="14" fill="#fff5f5" stroke="none" />
+  <clipPath id="clip_k1"><rect x="642" y="302" width="290" height="82" rx="12" /></clipPath>
+  <path d="M 558.08 390 Q 597.57 343.12, 636.48 296 M 568.66 390 Q 606.74 341.87, 647.85 296 M 578.89 390 Q 618.53 342.89, 656.39 296 M 587.59 390 Q 626.87 342.93, 667.34 296 M 597.08 390 Q 638.35 342.21, 676.62 296 M 607.76 390 Q 647.63 342.23, 686.42 296 M 618.83 390 Q 658.45 342.47, 696.16 296 M 628.56 390 Q 667.72 342.35, 707.79 296 M 637.2 390 Q 676.77 343.74, 717.02 296 M 647.36 390 Q 687.94 341.86, 727.66 296 M 657.37 390 Q 696.79 342.38, 736.59 296 M 668.61 390 Q 708.17 343.62, 747.71 296 M 677.26 390 Q 717.28 343.79, 757.96 296 M 687.96 390 Q 728 342.57, 766.29 296 M 697.51 390 Q 736.97 342.03, 777.8 296 M 707.39 390 Q 748.18 343.32, 787.28 296 M 718.78 390 Q 756.59 342.65, 796.53 296 M 728.91 390 Q 767.6 343.61, 808.06 296 M 737.8 390 Q 776.88 342.85, 816.15 296 M 748.06 390 Q 787.14 342.42, 827.18 296 M 758.69 390 Q 798.25 343.08, 836.91 296 M 767.4 390 Q 807.25 342.86, 846.72 296 M 778.6 390 Q 816.97 342.17, 857.88 296 M 788.45 390 Q 828.3 343.71, 867.16 296 M 797.84 390 Q 837.74 342.13, 876.95 296 M 808.32 390 Q 847.41 343.45, 887.25 296 M 818.9 390 Q 858.09 343.02, 897.88 296 M 828.97 390 Q 868.07 343.71, 907.55 296 M 837.78 390 Q 876.45 343.72, 916.22 296 M 847.74 390 Q 887.18 343.3, 926.37 296 M 857.32 390 Q 897.35 343.26, 936.73 296 M 868.25 390 Q 907.59 343.43, 947.58 296 M 877.15 390 Q 917.24 343.33, 957.64 296 M 888.6 390 Q 927.19 342.04, 966.66 296 M 898.95 390 Q 937.94 343.36, 977.96 296 M 907.35 390 Q 948.52 343.93, 987.08 296 M 917.07 390 Q 956.9 342.71, 996.38 296 M 927.17 390 Q 967.59 341.88, 1007.51 296 M 937.35 390 Q 977.11 343.96, 1017.12 296 M 948.64 390 Q 988.08 343.28, 1026.24 296 M 958.39 390 Q 998.68 342.55, 1036.54 296 M 968.25 390 Q 1007.53 341.94, 1046.12 296 M 977.57 390 Q 1017.66 344.1, 1057.98 296 M 987.8 390 Q 1028.66 343.31, 1067.2 296 M 997.16 390 Q 1038.4 342.94, 1076.4 296 M 1008.3 390 Q 1048.29 342.09, 1086.89 296 M 1018.64 390 Q 1057.27 342.77, 1097.04 296" clip-path="url(#clip_k1)" fill="none" stroke="#ffc9c9" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 653.56 299.93 Q 785.78 298.91, 919.78 300.28 Q 932.98 300.19, 933.41 313.56 Q 932.98 342.64, 932.97 371.84 Q 933.01 385.77, 919.78 385.47 Q 786.4 385.59, 653.56 384.98 Q 639.46 385.56, 639.94 371.84 Q 639.43 342.62, 639.29 313.56 Q 639.99 300.19, 653.57 299.6" fill="none" stroke="#1e1e1e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 653.27 300.11 Q 787.12 300.86, 920.43 300.54 Q 934.45 300.12, 934.12 313.8 Q 934.27 343.9, 934.05 372.62 Q 933.9 386.28, 920.43 386.31 Q 786.57 386.98, 653.27 386.2 Q 639.51 386.65, 639.58 372.62 Q 639.78 342.9, 640.09 313.8 Q 639.23 300.21, 653.52 299.98" fill="none" stroke="#1e1e1e" stroke-width="1.37" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />
+  <text x="787" y="337" class="node-title" text-anchor="middle" >库米 K1 · 公域前线 (T3)</text>
+  <text x="787" y="363" class="node-sub" text-anchor="middle" >只读 KB 答疑 · 上报摘要</text>
+  <path d="M 554.55 304.27 C 554.19 331.1, 553.41 354.17, 554.98 383.48 M 554.14 303.78 C 554.13 332.92, 554.35 359.76, 553.88 384" fill="none" stroke="#ced4da" stroke-width="1.5" stroke-dasharray="5 6" stroke-linecap="round" />
+  <rect x="174" y="482" width="760" height="98" rx="16" fill="#f3f0ff" stroke="none" />
+  <clipPath id="clip_mailroom"><rect x="176" y="484" width="756" height="94" rx="14" /></clipPath>
+  <path d="M 80 584 Q 124.24 529.84, 169.99 478 M 90.18 584 Q 136.94 530.12, 180.82 478 M 101.67 584 Q 147.61 531.63, 192.76 478 M 112.41 584 Q 157.05 530.27, 202.18 478 M 124.81 584 Q 168.96 532.07, 213.93 478 M 134.52 584 Q 180.94 531.4, 225.51 478 M 145.25 584 Q 191.24 531.27, 235.18 478 M 156.51 584 Q 202.58 530.96, 247.07 478 M 168.87 584 Q 213.12 531.24, 257.24 478 M 178.83 584 Q 224.96 532, 269.05 478 M 190.22 584 Q 236.27 529.92, 281.15 478 M 200.3 584 Q 245.37 530.81, 290.86 478 M 212.75 584 Q 256.25 531.05, 302.22 478 M 223.77 584 Q 268.58 529.81, 313.31 478 M 233.15 584 Q 278.24 531.85, 324.99 478 M 244.93 584 Q 289.75 532.18, 334.18 478 M 255.67 584 Q 300.97 532.02, 345.88 478 M 266.65 584 Q 311.32 531.45, 357.39 478 M 277.09 584 Q 322.41 530.72, 368.42 478 M 288.8 584 Q 334.69 531.59, 379.4 478 M 299.34 584 Q 344.59 530.21, 389.99 478 M 311.27 584 Q 355.78 530.3, 400.53 478 M 321.36 584 Q 367.11 530.38, 412.43 478 M 333.95 584 Q 377.4 530.58, 422.74 478 M 344.37 584 Q 388.23 529.91, 434.73 478 M 355.14 584 Q 400.59 531.09, 445.45 478 M 365.95 584 Q 410.59 531.11, 455.51 478 M 376.04 584 Q 421.75 532.01, 468.11 478 M 387.95 584 Q 433.7 531.84, 478.65 478 M 399.04 584 Q 443.99 530.46, 489.73 478 M 409.38 584 Q 454.76 530.16, 500.47 478 M 420.35 584 Q 466.11 532.13, 512 478 M 431.62 584 Q 478.22 530.41, 521.88 478 M 442.57 584 Q 488.49 531.3, 532.76 478 M 454.67 584 Q 500.06 531.73, 543.71 478 M 464.22 584 Q 510.58 529.88, 554.45 478 M 475.65 584 Q 521.34 530.29, 566.41 478 M 486.14 584 Q 532.62 531.36, 576.34 478 M 498.11 584 Q 544.08 531.84, 588.6 478 M 508.8 584 Q 552.96 532.13, 598.19 478 M 519.19 584 Q 564 531.11, 609.78 478 M 531.53 584 Q 575.65 531.71, 621.44 478 M 542.69 584 Q 586.58 530.97, 632.06 478 M 553.13 584 Q 598.08 531.34, 643.78 478 M 563.15 584 Q 609.98 530.16, 654.44 478 M 574.2 584 Q 620.51 530.53, 665.28 478 M 585.95 584 Q 631.67 530.72, 676.1 478 M 597.12 584 Q 641.91 530.23, 686.96 478 M 608.91 584 Q 652.29 531.35, 698.87 478 M 618.19 584 Q 663.83 530.8, 709.21 478 M 630.79 584 Q 674.43 530.3, 719.69 478 M 641.66 584 Q 686.44 530.9, 731.51 478 M 651.68 584 Q 696.61 531.5, 741.85 478 M 663.41 584 Q 708.06 530.83, 752.57 478 M 674.53 584 Q 720.15 531.94, 763.39 478 M 685.88 584 Q 730.87 530.74, 775.6 478 M 696.23 584 Q 740.69 530.97, 786.36 478 M 706.82 584 Q 752.45 530.43, 797.98 478 M 718.72 584 Q 764.22 531.02, 808.06 478 M 728.44 584 Q 773.79 530.58, 819.99 478 M 740.89 584 Q 785.92 531.66, 829.21 478 M 750.51 584 Q 795.63 532.19, 842.15 478 M 762.39 584 Q 806.52 531.05, 851.69 478 M 773.02 584 Q 817.69 531.81, 863.83 478 M 783.56 584 Q 829.05 529.82, 874.77 478 M 794.57 584 Q 841.19 530.8, 885.26 478 M 806.77 584 Q 850.17 531.13, 895.32 478 M 817.68 584 Q 862.43 532.07, 906.66 478 M 828.69 584 Q 872.16 531.68, 917.33 478 M 839.65 584 Q 884.52 530.37, 928.76 478 M 849.46 584 Q 894.13 530.8, 939.81 478 M 860.69 584 Q 906.67 531.24, 950.22 478 M 871.7 584 Q 917.18 529.89, 962.12 478 M 883.64 584 Q 928.52 531.32, 972.84 478 M 893.8 584 Q 938.55 530.65, 984.09 478 M 904.77 584 Q 951.06 531.4, 995.72 478 M 916.96 584 Q 959.89 530.89, 1005.97 478 M 926.63 584 Q 971.29 531.32, 1016.78 478 M 937.84 584 Q 983.89 530.37, 1027.39 478 M 949.89 584 Q 994.99 531.29, 1039.36 478 M 959.01 584 Q 1005.88 530.77, 1050.05 478 M 970.66 584 Q 1016.96 531.27, 1061.65 478 M 982.31 584 Q 1026.12 530.88, 1072.14 478 M 993.55 584 Q 1038.74 530.26, 1082.38 478 M 1003.07 584 Q 1048.86 532.14, 1093.92 478 M 1015.85 584 Q 1060.33 529.84, 1106.12 478 M 1025.38 584 Q 1072.25 531.88, 1115.53 478" clip-path="url(#clip_mailroom)" fill="none" stroke="#d0bfff" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 190.17 482.23 Q 555.26 481.58, 918.68 482.16 Q 934.21 482.38, 934.63 498.18 Q 934.48 531.12, 934.08 563.79 Q 934.92 579.54, 918.68 579.74 Q 553.57 578.76, 190.17 579.6 Q 173.73 579.59, 174.22 563.79 Q 174.47 530.65, 174.21 498.18 Q 174.1 482.7, 190.39 482.47" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 189.59 482.56 Q 553.89 483.2, 918.39 482.35 Q 933.71 482.68, 933.99 498.16 Q 933.58 531.47, 933.77 564.17 Q 933.58 580.05, 918.39 579.77 Q 553.96 580.21, 189.59 579.41 Q 173.73 579.82, 173.99 564.17 Q 173.63 531.6, 174.35 498.16 Q 173.94 482.37, 190.12 482.35" fill="none" stroke="#1e1e1e" stroke-width="1.44" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />
+  <text x="554" y="518" class="node-title-lg" text-anchor="middle" >Deck Mailroom · 极简收发室</text>
+  <text x="554" y="543" class="node-sub" text-anchor="middle" >RBAC 路由  ·  L3 持久化审批  ·  SHA256 工件  ·  密钥脱敏</text>
+  <text x="554" y="565" class="node-accent-purple" text-anchor="middle" >同机 SQLite（零服务）   /   跨端 deck-relay（SSH 隧道 · 出站 WS）</text>
+  <rect x="174" y="678" width="316" height="76" rx="14" fill="#ebfbee" stroke="none" />
+  <clipPath id="clip_mcp"><rect x="176" y="680" width="312" height="72" rx="12" /></clipPath>
+  <path d="M 101.07 758 Q 136.55 714.96, 171.73 674 M 111.09 758 Q 145.99 716.83, 182.42 674 M 121.27 758 Q 156.45 716.34, 192.02 674 M 131.5 758 Q 167.36 715.88, 202.53 674 M 141.19 758 Q 177.52 716.89, 212.07 674 M 152.77 758 Q 186.19 716.88, 222.65 674 M 161.69 758 Q 197.02 715.45, 231.85 674 M 172.32 758 Q 207.56 714.83, 242.14 674 M 181.99 758 Q 216.16 714.92, 251 674 M 191.58 758 Q 227.27 716.79, 261.85 674 M 202.18 758 Q 237.27 715.52, 271.8 674 M 211.12 758 Q 247.38 715.69, 282.1 674 M 222.19 758 Q 257.17 715.35, 292.89 674 M 231.63 758 Q 267.6 717.08, 302.33 674 M 241.55 758 Q 276.16 715.08, 312.16 674 M 252.52 758 Q 287.93 715.64, 321.8 674 M 262.36 758 Q 298.07 715.91, 331.87 674 M 271.92 758 Q 306.1 715.34, 342.74 674 M 281.56 758 Q 316.79 716.16, 351.02 674 M 291.53 758 Q 326.86 715.46, 361.51 674 M 301.07 758 Q 337.93 716.39, 371.55 674 M 311.99 758 Q 346.89 715.92, 381.85 674 M 321.75 758 Q 358.04 716.07, 392.4 674 M 332.42 758 Q 367.03 716.1, 401.25 674 M 342.39 758 Q 377.01 716.89, 411.3 674 M 351.81 758 Q 386.75 715.33, 421.61 674 M 362.78 758 Q 396.74 716.95, 432.03 674 M 372.31 758 Q 407.42 715.65, 441.79 674 M 382.58 758 Q 416.18 715.2, 452.15 674 M 391.53 758 Q 427.67 716.29, 462.86 674 M 402.28 758 Q 437.01 717.14, 471.89 674 M 412.41 758 Q 446.52 717.07, 481.41 674 M 422.29 758 Q 458.12 715.72, 491.12 674 M 431.06 758 Q 466.77 716.72, 501.57 674 M 442.21 758 Q 477.44 716.32, 511.82 674 M 452.23 758 Q 488.01 716, 522.31 674 M 462.34 758 Q 496.24 717.16, 532.51 674 M 472.92 758 Q 507.8 716.75, 541.15 674 M 482.55 758 Q 516.37 715.42, 552.03 674 M 491.35 758 Q 527.82 715.07, 562.39 674 M 502.68 758 Q 537.31 716.23, 572.62 674 M 512.95 758 Q 546.7 715.94, 582.82 674 M 522.64 758 Q 556.01 715.01, 591.15 674 M 531.9 758 Q 566.7 717.07, 601.61 674 M 541.84 758 Q 576.1 716.22, 611.74 674 M 552.78 758 Q 588.1 716.21, 622.91 674 M 561.79 758 Q 597.25 716.29, 632.37 674" clip-path="url(#clip_mcp)" fill="none" stroke="#b2f2bb" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 188.85 678.43 Q 332.16 677.9, 475.68 678.53 Q 489.69 678.95, 490.05 692.81 Q 490.05 716.73, 489.74 740.13 Q 489.88 754.48, 475.68 754.5 Q 331.66 755.26, 188.85 754.1 Q 174.64 754.75, 174.48 740.13 Q 174.8 717.11, 174.98 692.81 Q 174.78 678.34, 188.32 678.71" fill="none" stroke="#1e1e1e" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 188.31 677.62 Q 331.69 677.2, 475.47 677.96 Q 489.83 677.48, 490.08 692.23 Q 490.33 716.71, 489.68 739.95 Q 490.33 754.92, 475.47 754.56 Q 332.5 754.56, 188.31 754.46 Q 173.35 754.67, 173.7 739.95 Q 172.84 715.51, 174.13 692.23 Q 173.64 678.03, 188.74 677.42" fill="none" stroke="#1e1e1e" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />
+  <text x="332" y="711" class="node-title" text-anchor="middle" >通用 MCP 套件</text>
+  <text x="332" y="736" class="node-sub" text-anchor="middle" >comm · dispatch · qq · kb</text>
+  <rect x="560" y="678" width="454" height="76" rx="14" fill="#ebfbee" stroke="none" />
+  <clipPath id="clip_dispatcher"><rect x="562" y="680" width="450" height="72" rx="12" /></clipPath>
+  <path d="M 488.94 758 Q 523.65 715.25, 558.85 674 M 498.04 758 Q 533.77 715.18, 568.49 674 M 508.26 758 Q 542.75 715.41, 578.22 674 M 518.67 758 Q 554.08 715.23, 588.77 674 M 528.14 758 Q 563.44 715.04, 598.87 674 M 538.67 758 Q 573.85 715.85, 607.81 674 M 547.3 758 Q 582.13 716.4, 617.03 674 M 557.86 758 Q 592.17 716.01, 627.63 674 M 567.74 758 Q 603.74 716.31, 638.92 674 M 578.14 758 Q 612.68 715.31, 647.54 674 M 587.87 758 Q 622.25 715.11, 658.39 674 M 597.85 758 Q 632.05 716.2, 668.81 674 M 608.59 758 Q 642.67 716.28, 678.13 674 M 618.04 758 Q 653.37 716.57, 688.18 674 M 627.14 758 Q 662.5 715.65, 698.56 674 M 638.6 758 Q 672.52 716.56, 708.26 674 M 647.6 758 Q 682.32 715.91, 716.97 674 M 657.14 758 Q 693.66 715.72, 727.37 674 M 668.52 758 Q 702.55 715.85, 737.36 674 M 677.79 758 Q 712.15 715.41, 746.94 674 M 688.2 758 Q 721.8 715.63, 757.28 674 M 698.21 758 Q 732.4 715.72, 768.38 674 M 708.88 758 Q 743.44 716.83, 778.06 674 M 717.86 758 Q 753.2 714.93, 788.4 674 M 727.8 758 Q 762.35 715.53, 798.48 674 M 738.87 758 Q 772.37 716.67, 808.24 674 M 748.52 758 Q 782.02 716.04, 817.64 674 M 758.82 758 Q 792.5 715.2, 827.93 674 M 767.19 758 Q 803.76 715.86, 837.94 674 M 777.49 758 Q 813.79 716.65, 847.86 674 M 787.09 758 Q 823.86 716.91, 858.43 674 M 797.38 758 Q 832.68 716.22, 867.45 674 M 808.36 758 Q 843.33 715.97, 877.53 674 M 818.57 758 Q 852.67 716.63, 887.37 674 M 827.9 758 Q 862.38 715.16, 897.69 674 M 838.62 758 Q 873.45 715.79, 907.75 674 M 848.92 758 Q 882.6 715.46, 917.46 674 M 857.36 758 Q 892.71 716.19, 928.39 674 M 867.58 758 Q 903.55 716.24, 938.34 674 M 878.81 758 Q 913.88 716.07, 948.05 674 M 888.19 758 Q 923.56 716.66, 958.08 674 M 898.87 758 Q 933.5 716.53, 968.63 674 M 907.87 758 Q 942.5 716.22, 977.06 674 M 918.32 758 Q 953.01 716.76, 987.09 674 M 927.82 758 Q 963.65 715.92, 996.99 674 M 938.51 758 Q 972.22 716.94, 1007.64 674 M 948.96 758 Q 981.96 716.81, 1017.2 674 M 958.02 758 Q 992.62 716.29, 1026.92 674 M 968.97 758 Q 1002.85 716.73, 1037.33 674 M 978.95 758 Q 1012.79 716.69, 1048.5 674 M 987.6 758 Q 1023.01 716.12, 1057.74 674 M 998.41 758 Q 1032.84 715.87, 1067.74 674 M 1008.14 758 Q 1042.68 716.76, 1077.82 674 M 1018.87 758 Q 1053.65 714.97, 1087.84 674 M 1027.84 758 Q 1063.21 717.07, 1098.68 674 M 1037.22 758 Q 1073.89 715.56, 1107.82 674 M 1048.82 758 Q 1083.95 716.67, 1118.23 674 M 1058.7 758 Q 1093.3 716.25, 1128.04 674 M 1067.91 758 Q 1102.92 716.25, 1137.37 674 M 1077.88 758 Q 1114.08 715.4, 1147.14 674 M 1087.54 758 Q 1123.86 715.02, 1158.58 674" clip-path="url(#clip_dispatcher)" fill="none" stroke="#b2f2bb" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 573.67 677.42 Q 787.45 678.07, 1000.17 676.93 Q 1014.15 677.51, 1014.63 691.87 Q 1015.51 715.73, 1014.47 739.47 Q 1014.31 754.32, 1000.17 753.92 Q 786.28 754.66, 573.67 754.15 Q 559.18 754.22, 559.22 739.47 Q 558.86 715.95, 559.5 691.87 Q 559.04 677.9, 574.1 677.87" fill="none" stroke="#1e1e1e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 574.27 677.56 Q 786.71 677.1, 999.87 677.56 Q 1013.78 677.64, 1013.7 691.39 Q 1014.44 715.97, 1013.22 739.84 Q 1013.86 753.31, 999.87 753.68 Q 786.78 753.9, 574.27 754.1 Q 560.71 753.3, 560.44 739.84 Q 560.95 715.14, 560.32 691.39 Q 560.76 677.83, 574.17 677.7" fill="none" stroke="#1e1e1e" stroke-width="1.37" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />
+  <text x="787" y="711" class="node-title" text-anchor="middle" >桌面工长 · Deck Dispatcher</text>
+  <text x="787" y="736" class="node-sub" text-anchor="middle" >Worktree · 附件落盘 · 心跳 · 取消 · 续聊</text>
+  <rect x="1084" y="682" width="284" height="68" rx="14" fill="#f8f9fa" stroke="none" />
+  <clipPath id="clip_adapters"><rect x="1086" y="684" width="280" height="64" rx="12" /></clipPath>
+  <path d="M 1019.18 754 Q 1051.22 716.93, 1083.3 678 M 1030.96 754 Q 1062.19 717.03, 1092.92 678 M 1041.98 754 Q 1072.78 714.88, 1105.56 678 M 1053.84 754 Q 1083.87 715.79, 1116.53 678 M 1064.42 754 Q 1094.61 716.36, 1127.06 678 M 1074.21 754 Q 1106.38 716.92, 1137.74 678 M 1085.93 754 Q 1118.12 716.47, 1148.76 678 M 1096.35 754 Q 1128.24 716.98, 1160.53 678 M 1108.22 754 Q 1138.55 717.14, 1169.62 678 M 1118.69 754 Q 1149.62 716.24, 1180.73 678 M 1130.05 754 Q 1161.15 715.13, 1192.18 678 M 1140.97 754 Q 1172.05 716.91, 1203.64 678 M 1152.03 754 Q 1182.98 716.58, 1213.86 678 M 1163.49 754 Q 1193.36 716.84, 1225.08 678 M 1173.1 754 Q 1204.09 716.76, 1237.07 678 M 1185.9 754 Q 1215.38 716.26, 1247.02 678 M 1196.93 754 Q 1227.88 716.69, 1258.18 678 M 1207.97 754 Q 1238.94 715.1, 1269.31 678 M 1217.97 754 Q 1249.44 717.04, 1279.66 678 M 1228.54 754 Q 1261.24 715.3, 1290.74 678 M 1240.72 754 Q 1271.87 714.84, 1303.04 678 M 1250.28 754 Q 1283.34 716.08, 1314.37 678 M 1262 754 Q 1292.23 716.9, 1325.46 678 M 1272.27 754 Q 1304.25 715.9, 1335.57 678 M 1284.98 754 Q 1314.98 715.9, 1346.51 678 M 1295.67 754 Q 1325.87 716.63, 1358.28 678 M 1305.91 754 Q 1337.76 715.87, 1368.01 678 M 1316.44 754 Q 1348.98 714.81, 1380.15 678 M 1328.4 754 Q 1359.55 715.75, 1389.63 678 M 1338.38 754 Q 1370.72 714.8, 1401.45 678 M 1349.07 754 Q 1382.17 716.77, 1412.37 678 M 1361.09 754 Q 1392.44 717.08, 1423.22 678 M 1371.95 754 Q 1403.71 716.01, 1433.71 678 M 1383.66 754 Q 1414.42 716.09, 1445.06 678 M 1393.91 754 Q 1425.17 715.52, 1457.52 678 M 1405.56 754 Q 1437.38 715.49, 1468.21 678 M 1415.74 754 Q 1446.23 715.08, 1477.97 678 M 1426.24 754 Q 1459.42 715.37, 1490 678" clip-path="url(#clip_adapters)" fill="none" stroke="#e9ecef" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 1098.31 682.05 Q 1226.13 681.46, 1353.74 681.71 Q 1368.44 681.97, 1368.34 696.66 Q 1369.49 715.41, 1367.83 735.41 Q 1368.28 749.65, 1353.74 750.02 Q 1226.04 749.35, 1098.31 750.12 Q 1083.99 750.54, 1083.7 735.41 Q 1082.79 716.69, 1084.24 696.66 Q 1083.46 682.29, 1097.57 682.09" fill="none" stroke="#6c757d" stroke-width="1.6" stroke-dasharray="9 7" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="1226" y="712" class="node-title-sm" text-anchor="middle" fill="#495057">adapters &amp; packs</text>
+  <text x="1226" y="735" class="node-sub" text-anchor="middle" >dsh-plugin · 业务管线槽</text>
+  <path d="M 1017.94 716.63 Q 1048.28 714.5, 1079.7 715.62" fill="none" stroke="#868e96" stroke-width="1.5" stroke-dasharray="7 6" stroke-linecap="round" />
+  <rect x="174" y="804" width="212" height="64" rx="13" fill="#ffffff" stroke="none" />
+  <clipPath id="clip_cli_dsh"><rect x="176" y="806" width="208" height="60" rx="11" /></clipPath>
+  <path d="M 114.28 872 Q 143.79 836.21, 173.77 800 M 125.88 872 Q 156.31 835.71, 184.3 800 M 137.1 872 Q 168.39 835.74, 196.16 800 M 149.72 872 Q 179.09 836.9, 209.12 800 M 161.08 872 Q 192.4 836.11, 219.92 800 M 173.54 872 Q 203.55 835.11, 232.74 800 M 186.78 872 Q 215.3 835.98, 245.64 800 M 198.75 872 Q 227.46 835.28, 256.34 800 M 210.97 872 Q 239.94 835.23, 269.8 800 M 221.18 872 Q 251.42 836.94, 280.54 800 M 234.42 872 Q 264.51 835.85, 292.89 800 M 246.36 872 Q 275 836.15, 305.07 800 M 257.19 872 Q 287.71 836.82, 315.93 800 M 269.83 872 Q 299.43 835.52, 329.08 800 M 282.98 872 Q 310.33 836.99, 341.5 800 M 293.85 872 Q 323.99 836.75, 352.33 800 M 305.32 872 Q 335.69 834.85, 364.01 800 M 318.62 872 Q 346.5 836.26, 376.25 800 M 329.05 872 Q 359.5 836.06, 389.45 800 M 341.17 872 Q 372.19 836.86, 400.75 800 M 354.57 872 Q 384.21 836.95, 412.4 800 M 365.76 872 Q 395.83 835.27, 424.81 800 M 378.96 872 Q 407.55 837.1, 436.22 800 M 390.37 872 Q 419.54 836.74, 449.64 800 M 402.23 872 Q 432.53 837.02, 460.06 800 M 413.04 872 Q 443.84 836.88, 472.37 800 M 426.58 872 Q 456.35 836.76, 485.84 800 M 437.59 872 Q 468.31 835.67, 497.13 800" clip-path="url(#clip_cli_dsh)" fill="none" stroke="#d3f9d8" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 186.02 804.6 Q 278.79 805.23, 373.36 804.96 Q 386.21 804.04, 385.93 817.17 Q 386.67 837.46, 385.88 856.11 Q 385.94 868.76, 373.36 868.68 Q 280.26 868.95, 186.02 869.1 Q 173.05 868.35, 173.45 856.11 Q 174.58 836.93, 173.41 817.17 Q 173.14 804.03, 185.79 805.35" fill="none" stroke="#2b2f36" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 186.55 804.45 Q 279.95 803.78, 372.95 804.13 Q 386.08 804.86, 385.77 817.27 Q 384.91 836.85, 385.86 855.41 Q 385.67 868.01, 372.95 868.23 Q 279.54 867.54, 186.55 868.69 Q 173.38 868.27, 173.73 855.41 Q 174.32 836.3, 173.96 817.27 Q 173.76 804.66, 186.2 804.37" fill="none" stroke="#2b2f36" stroke-width="1.26" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />
+  <text x="280" y="833" class="node-title-sm" text-anchor="middle" >dsh CLI</text>
+  <text x="280" y="855" class="node-sub-sm" text-anchor="middle" >headless --json</text>
+  <rect x="416" y="804" width="212" height="64" rx="13" fill="#ffffff" stroke="none" />
+  <clipPath id="clip_cli_agy"><rect x="418" y="806" width="208" height="60" rx="11" /></clipPath>
+  <path d="M 355.94 872 Q 384.62 836.97, 414.67 800 M 367.95 872 Q 398.04 835.56, 426.31 800 M 380.57 872 Q 408.84 834.81, 439.6 800 M 392.89 872 Q 422.28 835.92, 450.35 800 M 403 872 Q 433.67 836.77, 463.34 800 M 416.3 872 Q 444.36 835.3, 475.43 800 M 428.48 872 Q 457.9 836.57, 486.82 800 M 440.06 872 Q 468.83 836.36, 499.23 800 M 451.74 872 Q 481.72 835.34, 511.8 800 M 463.38 872 Q 494.22 835.65, 523.23 800 M 476.08 872 Q 505.25 835.92, 534.23 800 M 487.49 872 Q 517.09 834.98, 547.53 800 M 499.41 872 Q 530.35 834.85, 559.58 800 M 511.1 872 Q 542.38 835.3, 570.48 800 M 523.28 872 Q 553.85 834.85, 582.57 800 M 536.55 872 Q 565.37 835.65, 594.23 800 M 548.89 872 Q 576.45 835.01, 606.9 800 M 560.05 872 Q 589.79 836.78, 618.7 800 M 571.23 872 Q 601.33 836.18, 629.99 800 M 584 872 Q 613.48 836.14, 643.73 800 M 596.67 872 Q 624.46 834.97, 654.59 800 M 608.14 872 Q 638.21 834.92, 666.07 800 M 619.16 872 Q 649.16 835.92, 679.29 800 M 632.89 872 Q 661.6 836.05, 691.12 800 M 644.59 872 Q 672.26 836.55, 702.76 800 M 655.64 872 Q 686.04 835.51, 715.43 800 M 668.87 872 Q 696.69 835.37, 726.83 800 M 679.62 872 Q 709.27 835.91, 738.88 800" clip-path="url(#clip_cli_agy)" fill="none" stroke="#d3f9d8" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 429.08 804.14 Q 521.55 804.65, 614.58 804.51 Q 627.37 804.52, 627.45 817.02 Q 628.02 836.1, 627.6 854.65 Q 627.24 867.26, 614.58 867.53 Q 522.66 868.27, 429.08 867.51 Q 416.3 867.03, 416.2 854.65 Q 416.21 836.03, 415.99 817.02 Q 416.63 804.61, 428.47 803.93" fill="none" stroke="#2b2f36" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 429.71 803.83 Q 521.68 804.6, 614.15 803.55 Q 627.44 803.67, 627.84 817.52 Q 628.24 835.34, 628.03 854.37 Q 627.89 867.98, 614.15 868.06 Q 522.2 867.7, 429.71 867.94 Q 415.61 867.83, 416.02 854.37 Q 416.54 835.31, 415.51 817.52 Q 416.31 804.13, 429.43 803.59" fill="none" stroke="#2b2f36" stroke-width="1.26" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />
+  <text x="522" y="833" class="node-title-sm" text-anchor="middle" >agy CLI</text>
+  <text x="522" y="855" class="node-sub-sm" text-anchor="middle" >--print --mode</text>
+  <rect x="658" y="804" width="212" height="64" rx="13" fill="#ffffff" stroke="none" />
+  <clipPath id="clip_cli_claude"><rect x="660" y="806" width="208" height="60" rx="11" /></clipPath>
+  <path d="M 597.41 872 Q 628.4 837.06, 657.18 800 M 610.41 872 Q 638.5 837.06, 669.5 800 M 622.1 872 Q 652.07 836.59, 681.36 800 M 633.72 872 Q 663.07 835.7, 693.39 800 M 645.9 872 Q 675.04 836.65, 705.52 800 M 658.04 872 Q 687.84 837.1, 716.64 800 M 669.72 872 Q 698.69 834.96, 729.45 800 M 681.18 872 Q 711.74 837.15, 740.41 800 M 693.44 872 Q 724.38 836.99, 752.58 800 M 705.13 872 Q 734.9 836.47, 765.69 800 M 717.2 872 Q 746.39 835.71, 776.81 800 M 730.49 872 Q 760.48 835.78, 788.42 800 M 741.89 872 Q 771.41 836.07, 800.06 800 M 754.17 872 Q 782.86 836.47, 812.07 800 M 766.71 872 Q 796.21 836.04, 824.64 800 M 777.68 872 Q 806.49 837.11, 837.17 800 M 789.9 872 Q 819.07 835.39, 848.69 800 M 801.22 872 Q 831.74 836.05, 861.71 800 M 814.8 872 Q 843.57 836.02, 873.6 800 M 825.29 872 Q 855.12 836.35, 884.36 800 M 837.14 872 Q 868.3 836.13, 896.65 800 M 849.47 872 Q 880.52 835.71, 908.31 800 M 862.5 872 Q 890.74 836.57, 920.87 800 M 874.33 872 Q 903.67 836.27, 932.04 800 M 885.65 872 Q 915.15 836.39, 945.21 800 M 898.72 872 Q 927.91 837, 956.77 800 M 909.39 872 Q 938.98 836.89, 969.56 800 M 921.65 872 Q 951.95 835.51, 979.99 800" clip-path="url(#clip_cli_claude)" fill="none" stroke="#d3f9d8" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 670.39 804.73 Q 764 804.88, 856.86 805.24 Q 870.25 804.83, 869.98 817.85 Q 870.17 837.16, 870.23 855.43 Q 870.24 868.86, 856.86 868.55 Q 764.2 868.6, 670.39 868.57 Q 657.6 868.47, 657.27 855.43 Q 656.11 836.68, 657.85 817.85 Q 656.74 804.88, 671.08 805.15" fill="none" stroke="#2b2f36" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 671.93 803.88 Q 763.8 804.34, 856.42 803.63 Q 869.86 803.87, 869.98 817.44 Q 870.77 836.4, 870.01 854.4 Q 870.35 868.08, 856.42 867.95 Q 763.86 868.04, 671.93 868.1 Q 658.21 868.08, 658.38 854.4 Q 659.21 835.63, 658.67 817.44 Q 658.45 804.31, 671.48 804.17" fill="none" stroke="#2b2f36" stroke-width="1.26" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />
+  <text x="764" y="833" class="node-title-sm" text-anchor="middle" >claude CLI</text>
+  <text x="764" y="855" class="node-sub-sm" text-anchor="middle" >-p --resume</text>
+  <rect x="900" y="804" width="212" height="64" rx="13" fill="#ffffff" stroke="none" />
+  <clipPath id="clip_cli_codex"><rect x="902" y="806" width="208" height="60" rx="11" /></clipPath>
+  <path d="M 840.91 872 Q 870.29 836.23, 899.39 800 M 851.21 872 Q 882.28 834.85, 910.49 800 M 864.75 872 Q 893.99 835.02, 922.79 800 M 875.03 872 Q 904.49 836.25, 933.92 800 M 887.05 872 Q 916.96 836.3, 946.73 800 M 900.01 872 Q 928.44 836.97, 959.02 800 M 912 872 Q 940.76 835.42, 970.37 800 M 924.27 872 Q 953.07 835.97, 982.19 800 M 936.16 872 Q 964.87 837.09, 995.75 800 M 948.9 872 Q 978.3 835.65, 1007.08 800 M 959.84 872 Q 988.49 834.81, 1018.91 800 M 972.72 872 Q 1000.85 836.35, 1030.77 800 M 983.73 872 Q 1014.28 834.83, 1043.19 800 M 995.8 872 Q 1026.25 836.61, 1055.8 800 M 1007.46 872 Q 1036.86 836.4, 1066.71 800 M 1019.1 872 Q 1049.06 836.57, 1079.78 800 M 1031.77 872 Q 1062.35 836.57, 1090.88 800 M 1044.18 872 Q 1072.65 835.47, 1102.39 800 M 1055.8 872 Q 1085.76 835.74, 1114.61 800 M 1067.99 872 Q 1098.16 834.97, 1126.76 800 M 1080.71 872 Q 1109.55 834.87, 1139.45 800 M 1092.25 872 Q 1120.8 835.22, 1150.02 800 M 1103.13 872 Q 1132.46 835.95, 1162.18 800 M 1116.68 872 Q 1144.25 835.94, 1175.26 800 M 1127.29 872 Q 1156.58 835.94, 1186.61 800 M 1139.31 872 Q 1169.79 836.43, 1199.79 800 M 1151.08 872 Q 1181.39 837.09, 1211.81 800 M 1164 872 Q 1193.97 836.66, 1222.58 800" clip-path="url(#clip_cli_codex)" fill="none" stroke="#d3f9d8" stroke-width="1.35" stroke-linecap="round" opacity="0.72" />
+  <path d="M 913.2 803.96 Q 1005.7 804.24, 1098.91 804.17 Q 1112.89 804.45, 1112.6 817.65 Q 1111.8 835.79, 1112.33 854.83 Q 1112.39 868.98, 1098.91 868.52 Q 1005.91 867.76, 913.2 867.87 Q 899.1 867.95, 899.5 854.83 Q 898.56 835.35, 898.91 817.65 Q 899.69 804.53, 913.89 804.57" fill="none" stroke="#2b2f36" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 913.24 803.76 Q 1006.23 803.45, 1098.97 803.59 Q 1111.89 803.81, 1112.16 816.95 Q 1112.87 836.2, 1112.41 854.89 Q 1112.3 868.32, 1098.97 868.08 Q 1005.51 868.65, 913.24 868.59 Q 900.35 867.72, 900.05 854.89 Q 900.54 835.59, 900.51 816.95 Q 899.89 803.74, 913.44 803.22" fill="none" stroke="#2b2f36" stroke-width="1.26" stroke-linecap="round" stroke-linejoin="round" opacity="0.82" />
+  <text x="1006" y="833" class="node-title-sm" text-anchor="middle" >codex CLI</text>
+  <text x="1006" y="855" class="node-sub-sm" text-anchor="middle" >exec --sandbox</text>
+  <rect x="1142" y="804" width="226" height="64" rx="13" fill="#f8f9fa" stroke="none" />
+  <path d="M 1155.32 803.27 Q 1254.02 804.47, 1354.04 803.92 Q 1366.96 803.27, 1367.29 816.52 Q 1366.11 835.89, 1367.13 855.51 Q 1366.98 868.3, 1354.04 868.76 Q 1255.16 869.77, 1155.32 868.77 Q 1141.58 868.4, 1142.07 855.51 Q 1142.02 836.3, 1142.13 816.52 Q 1141.74 802.83, 1155.84 802.78" fill="none" stroke="#6c757d" stroke-width="1.6" stroke-dasharray="9 7" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="1255" y="833" class="node-title-sm" text-anchor="middle" fill="#495057">zcode / custom</text>
+  <text x="1255" y="855" class="node-sub-sm" text-anchor="middle" >YAML 扩展任意 CLI</text>
+  <path d="M 320.91 193.33 Q 317.61 245.7, 320.38 296.38" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" />
+  <path d="M 320.99 194.24 Q 318.31 244.81, 321.04 296.02" fill="none" stroke="#2b2f36" stroke-width="1.2" stroke-linecap="round" opacity="0.72" />
+  <path d="M 316 286.2 Q 318.66 290.91, 321 296 M 325.36 285.9 Q 323.38 290.45, 321 296" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 325.34 204.11 Q 322.93 198.98, 321 194 M 315.58 203.57 Q 318.52 198.71, 321 194" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="336" y="241" class="arrow-lbl" text-anchor="start" >私聊 · 传文件 · 审批</text>
+  <path d="M 787.31 193.24 Q 790.23 244.78, 786.32 296.31" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" />
+  <path d="M 787.28 194.42 Q 789.85 244.66, 787.03 295.88" fill="none" stroke="#2b2f36" stroke-width="1.2" stroke-linecap="round" opacity="0.72" />
+  <path d="M 782.89 285.8 Q 784.43 291.36, 787 296 M 792.4 286.42 Q 789.55 291.67, 787 296" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 792.11 203.74 Q 789.21 199.34, 787 194 M 782.83 204.18 Q 784.83 198.99, 787 194" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="802" y="241" class="arrow-lbl" text-anchor="start" >群答疑 · 采反馈</text>
+  <path d="M 320.77 390.31 Q 325.04 433.47, 321.53 477.65" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" />
+  <path d="M 321.24 389.96 Q 324.27 433.83, 321.23 478.19" fill="none" stroke="#2b2f36" stroke-width="1.2" stroke-linecap="round" opacity="0.72" />
+  <path d="M 317.04 467.74 Q 318.46 473.44, 321 478 M 326.62 468.55 Q 323.76 472.75, 321 478" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 326.41 399.58 Q 323.52 394.25, 321 390 M 316.68 400.12 Q 318.3 394.83, 321 390" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="336" y="441" class="arrow-lbl" text-anchor="start" >T1 派单 / 收简报</text>
+  <path d="M 787.24 390.34 Q 783.82 433.01, 786.44 477.42" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" />
+  <path d="M 786.89 389.8 Q 784.29 433.37, 786.65 477.76" fill="none" stroke="#2b2f36" stroke-width="1.2" stroke-linecap="round" opacity="0.72" />
+  <path d="M 781.47 468.49 Q 784.33 472.7, 787 478 M 791.3 467.88 Q 789.47 473.44, 787 478" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 791.13 400.2 Q 788.71 395.54, 787 390 M 781.85 399.72 Q 783.92 394.67, 787 390" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="802" y="441" class="arrow-lbl" text-anchor="start" >T3 上报 / 收指令</text>
+  <path d="M 320.84 583.21 Q 319.04 628.7, 320.41 674.78" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" />
+  <path d="M 321.26 583.83 Q 317.56 628.14, 320.78 674.41" fill="none" stroke="#2b2f36" stroke-width="1.2" stroke-linecap="round" opacity="0.72" />
+  <path d="M 315.75 664.33 Q 318.77 668.66, 321 674 M 324.82 663.69 Q 322.84 669.35, 321 674" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 325.12 594.2 Q 323.65 589.37, 321 584 M 315.42 593.48 Q 318.02 588.82, 321 584" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="305" y="622" class="arrow-lbl" text-anchor="end" >MCP 直连</text>
+  <path d="M 786.29 584.22 Q 789.21 628.93, 786.81 674.33" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" />
+  <path d="M 787.16 584.21 Q 790.4 628.56, 787.34 673.92" fill="none" stroke="#2b2f36" stroke-width="1.2" stroke-linecap="round" opacity="0.72" />
+  <path d="M 782.89 663.8 Q 785.46 668.47, 787 674 M 792.01 664.21 Q 789.5 669.16, 787 674" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 792.48 593.54 Q 789.67 589.28, 787 584 M 783.23 594.33 Q 785.41 589.55, 787 584" fill="none" stroke="#2b2f36" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="802" y="622" class="arrow-lbl" text-anchor="start" >出站 WS / SSH 隧道</text>
+  <g transform="rotate(-1.2 556 614)">
+    <path d="M 460.97 624.68 C 528.07 626.4, 594.62 626.27, 651.57 623.27 M 462.36 624.49 C 533.17 626.31, 586.75 626.41, 652.09 624.15" fill="none" stroke="#e03131" stroke-width="1.7" stroke-dasharray="6 5" stroke-linecap="round" opacity="0.72" />
+    <path d="M 475.84 602.96 C 479.56 606.73, 484.72 610.85, 487.69 614.62 M 475.92 602.95 C 479.44 606.85, 484.38 611, 487.81 615.16 M 487.64 603.41 C 483.55 607.88, 479.54 611.84, 476.18 614.87 M 487.87 602.72 C 483.64 606.96, 479.93 611.25, 475.82 615.2" fill="none" stroke="#e03131" stroke-width="2.2" stroke-linecap="round" />
+    <text x="498" y="615" class="red-note" text-anchor="start">T2 ↮ T3 严禁直连</text>
+  </g>
+  <path d="M 1089.61 185.86 Q 1019.28 241.02, 969.41 331.66" fill="none" stroke="#868e96" stroke-width="1.55" stroke-dasharray="7 6" stroke-linecap="round" />
+  <path d="M 969.96 322.05 Q 969.54 327.58, 969 332 M 977.29 326.4 Q 972.72 329.26, 969 332" fill="none" stroke="#868e96" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="1062" y="266" class="arrow-lbl-muted" text-anchor="middle" >引导部署 QQ</text>
+  <path d="M 1254.65 222.68 Q 1271.66 430.16, 1254.35 638.46" fill="none" stroke="#868e96" stroke-width="1.55" stroke-dasharray="7 6" stroke-linecap="round" />
+  <path d="M 1250.47 628.65 Q 1252.6 632.85, 1254 638 M 1259.35 629.55 Q 1256.25 633.94, 1254 638" fill="none" stroke="#868e96" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="1278" y="434" class="arrow-lbl-muted" text-anchor="start" >任意 Agent 自动配置</text>
+  <path d="M 786.5 755.26 Q 544.84 762.78, 326.01 800.57" fill="none" stroke="#343a40" stroke-width="1.65" stroke-linecap="round" />
+  <path d="M 786.64 756.42 Q 545.01 762.96, 326.36 799.91" fill="none" stroke="#343a40" stroke-width="1.07" stroke-linecap="round" opacity="0.72" />
+  <path d="M 333.71 794.45 Q 329.32 797.18, 326 800 M 335.22 802.29 Q 330.65 801.41, 326 800" fill="none" stroke="#343a40" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 787.05 756.77 Q 652.65 773.03, 530.72 799.51" fill="none" stroke="#343a40" stroke-width="1.65" stroke-linecap="round" />
+  <path d="M 787.37 755.73 Q 651.67 772.12, 529.63 800.19" fill="none" stroke="#343a40" stroke-width="1.07" stroke-linecap="round" opacity="0.72" />
+  <path d="M 537.35 793.98 Q 533.26 796.54, 530 800 M 539.26 802.13 Q 534.32 801.05, 530 800" fill="none" stroke="#343a40" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 786.26 755.94 Q 774.92 777.78, 763.72 800.69" fill="none" stroke="#343a40" stroke-width="1.65" stroke-linecap="round" />
+  <path d="M 787.33 756.32 Q 774.57 777.95, 763.61 800.25" fill="none" stroke="#343a40" stroke-width="1.07" stroke-linecap="round" opacity="0.72" />
+  <path d="M 764.46 790.51 Q 763.83 795.74, 764 800 M 771.69 794.42 Q 767.43 797.65, 764 800" fill="none" stroke="#343a40" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 787.76 755.71 Q 902.99 771.14, 1005.97 799.99" fill="none" stroke="#343a40" stroke-width="1.65" stroke-linecap="round" />
+  <path d="M 786.71 756.32 Q 901.34 772.21, 1006.29 799.93" fill="none" stroke="#343a40" stroke-width="1.07" stroke-linecap="round" opacity="0.72" />
+  <path d="M 996.71 801.98 Q 1000.79 801.5, 1006 800 M 998.79 793.82 Q 1002.03 796.33, 1006 800" fill="none" stroke="#343a40" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 787.4 756.56 Q 1040.8 761.56, 1251.38 799.79" fill="none" stroke="#343a40" stroke-width="1.65" stroke-linecap="round" />
+  <path d="M 787.36 756.23 Q 1039.34 762.41, 1251.65 799.85" fill="none" stroke="#343a40" stroke-width="1.07" stroke-linecap="round" opacity="0.72" />
+  <path d="M 1242.91 802.77 Q 1248.06 801.3, 1252 800 M 1244.48 794.2 Q 1248.28 797.32, 1252 800" fill="none" stroke="#343a40" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 231.59 755.6 Q 225.1 778.37, 232.32 800.23" fill="none" stroke="#2f9e44" stroke-width="1.55" stroke-dasharray="7 6" stroke-linecap="round" />
+  <path d="M 225.99 793.3 Q 229.32 796.84, 232 800 M 233.66 791.15 Q 232.65 796.16, 232 800" fill="none" stroke="#2f9e44" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 233.39 764.89 Q 233.11 760.3, 232 756 M 225.98 762.69 Q 228.74 759.94, 232 756" fill="none" stroke="#2f9e44" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="245" y="785" class="arrow-lbl-green" text-anchor="start" >MCP 回报</text>
+  <text x="152" y="916" class="footnote" text-anchor="start" >deck CLI: scan · status · up · daemon · doctor · trace</text>
+  <text x="1396" y="916" class="footnote-right" text-anchor="end" >TensorHub-ORG / Harness-Deck</text>
 </svg>

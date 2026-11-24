@@ -11,7 +11,7 @@
 
 ![Harness-Deck v1 系统架构图](docs/architecture.png)
 
-> 矢量高清源图：[`docs/architecture.svg`](docs/architecture.svg) · 高清成图（3200×2160）：[`docs/architecture.png`](docs/architecture.png)
+> 矢量高清源图：[`docs/architecture.svg`](docs/architecture.svg) · 高清成图（2920×1880）：[`docs/architecture.png`](docs/architecture.png)
 
 ---
 

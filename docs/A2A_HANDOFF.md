@@ -13,7 +13,7 @@
 - **Project**: **Harness-Deck** — *"连接并驾驭。 / Connect and harness."* (`https://github.com/TensorHub-ORG/Harness-Deck`, MIT License)
 - **What it is**: A **tool-neutral, Human-in-the-Loop multi-agent collaboration protocol (`HDP v1`)** and modular **Skill + MCP + CLI** bundle built for TensorHub-ORG (`Coomi`, `Qmmi`, `Latexsnipper`, `Storydex`, etc.) and personal multi-CLI orchestration.
 - **Core Stack**: TypeScript 5.9 (`ESM`), `pnpm` monorepo, **Node.js `>= 22.5`** using built-in `node:sqlite` (**zero native C++ addons**), `zod`, `@modelcontextprotocol/sdk`, `ws`, `yaml`.
-- **Architecture Diagram**: [`docs/architecture.png`](architecture.png) / [`docs/architecture.svg`](architecture.svg) (dark monochrome schematic; keep in sync when changing layers or tiers).
+- **Architecture Diagram**: [`docs/architecture.png`](architecture.png) / [`docs/architecture.svg`](architecture.svg) (minimalist Excalidraw whiteboard schematic; keep in sync when changing layers or tiers).
 
 ---
 
@@ -164,7 +164,7 @@ When operating on an already-deployed host, local machine configuration lives in
 - Full HDP v1 monorepo (`protocol`, `mailroom`, `dispatcher`, `cli`, 4 `mcps`, `adapters/dsh-plugin`, 7 `skills` incl. `deck-pilot`, Docker + native `systemd` `deploy/`, GitHub Actions CI `.github/workflows/ci.yml`).
 - Everyday operations & reliability upgrades: `pnpm deck status`, `pnpm deck up` auto-restart supervisor, `pnpm deck daemon` OS autostart generator, `pnpm deck cancel` live task termination (`status: "cancelled"`), long-task periodic heartbeats, QQ → Desktop inbound file/image ingestion (`_inputs/<task_id>/` + `--add-dir`), and QQ `续聊 T-xxxx` / `resume_from_task_id` session resume.
 - Production live verification: Aliyun 2C2G native `systemd` `deck-relay` + SSH tunnel + NapCat `Coomi O1` + CPA OpenAI-compatible Brain + Desktop Foreman (`dsh` + `agy`) + L3 persistent approval + Desktop-to-QQ PDF artifact delivery.
-- Clean public repository at `https://github.com/TensorHub-ORG/Harness-Deck` with dark technical architecture schematic ([`docs/architecture.png`](architecture.png)).
+- Clean public repository at `https://github.com/TensorHub-ORG/Harness-Deck` with minimalist Excalidraw whiteboard architecture schematic ([`docs/architecture.png`](architecture.png)).
 
 ### Intentionally Deferred
 - API Aggregation Platform (`packs/api-gateway-slot/`) — deferred to a later milestone.
