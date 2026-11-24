@@ -1,10 +1,40 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { DeckEnvelope, generateTaskId, scrubSecrets } from "@harness-deck/protocol";
+import { ArtifactRef, DeckEnvelope, generateTaskId, scrubSecrets } from "@harness-deck/protocol";
 import { MailroomClient } from "@harness-deck/mailroom";
-import { OneBotClient, OneBotEvent } from "./onebot.js";
+import { InboundMediaItem, OneBotClient, OneBotEvent, extractInboundMedia } from "./onebot.js";
 import { LlmBrainConfig, OpenAiCompatibleBrain, ToolDefinition, ToolHandlerMap } from "./llm-brain.js";
+
+interface PendingDispatchRecord {
+  taskId: string;
+  targetWorkerId: string;
+  project: string;
+  instruction: string;
+  preferredDriver?: string;
+  bossQq: string;
+  resumeSessionId?: string;
+  existingBranch?: string;
+  reworkOfTaskId?: string;
+  attachments?: ArtifactRef[];
+}
+
+const MAX_INBOUND_FILE_BYTES = 25 * 1024 * 1024;
+const BOSS_ARTIFACT_TTL_MS = 15 * 60 * 1000;
+
+function inferMimeType(filename: string, kind: "file" | "image"): string {
+  const ext = path.extname(filename).toLowerCase();
+  if (ext === ".pdf") return "application/pdf";
+  if (ext === ".png") return "image/png";
+  if (ext === ".jpg" || ext === ".jpeg") return "image/jpeg";
+  if (ext === ".webp") return "image/webp";
+  if (ext === ".gif") return "image/gif";
+  if (ext === ".txt" || ext === ".log" || ext === ".md") return "text/plain";
+  if (ext === ".json") return "application/json";
+  if (ext === ".csv") return "text/csv";
+  if (ext === ".zip") return "application/zip";
+  return kind === "image" ? "image/png" : "application/octet-stream";
+}
 
 export interface QqBridgeOptions {
   profile: "o1" | "k1";
@@ -44,17 +74,9 @@ export class QqBridgeDaemon {
   private readonly personaText: string;
   private readonly log: (msg: string) => void;
   private readonly processingEnvelopeIds = new Set<string>();
-  private readonly pendingL3Dispatches = new Map<
-    string,
-    {
-      taskId: string;
-      targetWorkerId: string;
-      project: string;
-      instruction: string;
-      preferredDriver?: string;
-      bossQq: string;
-    }
-  >();
+  private readonly pendingL3Dispatches = new Map<string, PendingDispatchRecord>();
+  private readonly recentBossArtifacts = new Map<string, Array<{ ref: ArtifactRef; uploadedAt: number }>>();
+  private readonly lastProgressNotifyAt = new Map<string, number>();
   private pollTimer: NodeJS.Timeout | null = null;
   private unsubWs: (() => void) | null = null;
 
@@ -141,14 +163,121 @@ export class QqBridgeDaemon {
     }
   }
 
+  private pruneBossArtifacts(bossQq: string): Array<{ ref: ArtifactRef; uploadedAt: number }> {
+    const now = Date.now();
+    const valid = (this.recentBossArtifacts.get(bossQq) ?? []).filter(
+      (item) => now - item.uploadedAt <= BOSS_ARTIFACT_TTL_MS
+    );
+    if (valid.length > 0) {
+      this.recentBossArtifacts.set(bossQq, valid);
+    } else {
+      this.recentBossArtifacts.delete(bossQq);
+    }
+    return valid;
+  }
+
+  private consumeBossArtifacts(bossQq: string): ArtifactRef[] {
+    const items = this.pruneBossArtifacts(bossQq);
+    this.recentBossArtifacts.delete(bossQq);
+    return items.map((i) => i.ref);
+  }
+
+  private async ingestBossMedia(bossQq: string, files: InboundMediaItem[]): Promise<ArtifactRef[]> {
+    const uploaded: ArtifactRef[] = [];
+    for (const item of files) {
+      try {
+        let data: Buffer | null = null;
+        let filename = item.filename;
+
+        if (item.localPath && fs.existsSync(item.localPath)) {
+          const stat = fs.statSync(item.localPath);
+          if (stat.size <= MAX_INBOUND_FILE_BYTES) {
+            data = fs.readFileSync(item.localPath);
+          }
+        }
+
+        if (!data && item.fileId) {
+          const res = await this.onebot.getFile(item.fileId);
+          const payload = (res.data ?? {}) as Record<string, unknown>;
+          const remoteFile = typeof payload.file === "string" ? payload.file : undefined;
+          const remoteBase64 = typeof payload.base64 === "string" ? payload.base64 : undefined;
+          const remoteUrl = typeof payload.url === "string" ? payload.url : undefined;
+          if (typeof payload.file_name === "string" && payload.file_name.trim()) {
+            filename = payload.file_name.trim();
+          }
+          if (remoteFile && fs.existsSync(remoteFile)) {
+            const stat = fs.statSync(remoteFile);
+            if (stat.size <= MAX_INBOUND_FILE_BYTES) {
+              data = fs.readFileSync(remoteFile);
+            }
+          } else if (remoteBase64) {
+            const decoded = Buffer.from(remoteBase64, "base64");
+            if (decoded.length <= MAX_INBOUND_FILE_BYTES) {
+              data = decoded;
+            }
+          } else if (remoteUrl && /^https?:\/\//i.test(remoteUrl)) {
+            const resp = await fetch(remoteUrl);
+            if (resp.ok) {
+              const arr = Buffer.from(await resp.arrayBuffer());
+              if (arr.length <= MAX_INBOUND_FILE_BYTES) data = arr;
+            }
+          }
+        }
+
+        if (!data && item.url && /^https?:\/\//i.test(item.url)) {
+          const resp = await fetch(item.url);
+          if (resp.ok) {
+            const arr = Buffer.from(await resp.arrayBuffer());
+            if (arr.length <= MAX_INBOUND_FILE_BYTES) data = arr;
+          }
+        }
+
+        if (!data || data.length === 0) {
+          this.log(`Could not retrieve bytes for inbound QQ ${item.kind} "${filename}"`);
+          continue;
+        }
+
+        const ref = await this.options.mailroom.uploadArtifact({
+          filename,
+          data,
+          mime_type: inferMimeType(filename, item.kind),
+        });
+        const existing = this.pruneBossArtifacts(bossQq);
+        existing.push({ ref, uploadedAt: Date.now() });
+        this.recentBossArtifacts.set(bossQq, existing.slice(-8));
+        uploaded.push(ref);
+      } catch (err) {
+        this.log(`Inbound media ingest error (${item.filename}): ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+    return uploaded;
+  }
+
   private async handleQqEvent(ev: OneBotEvent): Promise<void> {
-    if (ev.post_type !== "message" || !ev.raw_message) return;
-    const text = ev.raw_message.trim();
     const senderId = String(ev.user_id ?? "");
 
     if (this.options.profile === "o1") {
-      // T1 Secretary ONLY accepts private commands from T0 Boss allowlist
-      if (ev.message_type !== "private" || !this.options.bossQqList.includes(senderId)) {
+      // T1 Secretary ONLY accepts private messages or offline_file notices from T0 Boss allowlist
+      if (!this.options.bossQqList.includes(senderId)) return;
+      const isPrivateMsg = ev.post_type === "message" && ev.message_type === "private";
+      const isOfflineFile = ev.post_type === "notice" && ev.notice_type === "offline_file";
+      if (!isPrivateMsg && !isOfflineFile) return;
+
+      const { text, files } = extractInboundMedia(ev);
+      let uploaded: ArtifactRef[] = [];
+      if (files.length > 0) {
+        uploaded = await this.ingestBossMedia(senderId, files);
+      }
+      if (!text) {
+        if (uploaded.length > 0) {
+          const desc = uploaded
+            .map((a) => `${a.filename}（${Math.max(1, Math.round(a.size_bytes / 1024))}KB）`)
+            .join("、");
+          await this.onebot.sendPrivateMessage(
+            senderId,
+            `收到文件 ${desc} 接下来直接说交给哪个项目和工位处理 我会自动附带给桌面 CLI（15分钟内有效）`
+          );
+        }
         return;
       }
       await this.handleBossCommand(senderId, text);
@@ -156,6 +285,8 @@ export class QqBridgeDaemon {
     }
 
     // Profile "k1" (T3 Frontline): ONLY allowlisted community QQ groups
+    if (ev.post_type !== "message" || !ev.raw_message) return;
+    const text = ev.raw_message.trim();
     const groupId = String(ev.group_id ?? "");
     if (ev.message_type !== "group" || !this.options.communityGroupList.includes(groupId)) {
       return;
@@ -202,16 +333,7 @@ export class QqBridgeDaemon {
     const pending =
       this.pendingL3Dispatches.get(rec.short_code) ??
       this.pendingL3Dispatches.get(rec.approval_id) ??
-      (rec.metadata?.pending_dispatch as
-        | {
-            taskId: string;
-            targetWorkerId: string;
-            project: string;
-            instruction: string;
-            preferredDriver?: string;
-            bossQq: string;
-          }
-        | undefined);
+      (rec.metadata?.pending_dispatch as PendingDispatchRecord | undefined);
     if (pending) {
       this.pendingL3Dispatches.delete(rec.short_code);
       await this.options.mailroom.sendEnvelope({
@@ -219,6 +341,7 @@ export class QqBridgeDaemon {
         to: { agent_id: pending.targetWorkerId, role: "worker", tier: "T2" },
         type: "task.dispatch",
         security: { risk_level: "L3", approval_ref: rec.approval_id },
+        attachments: pending.attachments ?? [],
         payload: {
           task_id: pending.taskId,
           project: pending.project,
@@ -226,13 +349,19 @@ export class QqBridgeDaemon {
           instruction: pending.instruction,
           preferred_driver: pending.preferredDriver,
           sandbox_profile: "L3_APPROVED_EXEC",
+          ...(pending.resumeSessionId ? { resume_session_id: pending.resumeSessionId } : {}),
+          ...(pending.existingBranch ? { existing_branch: pending.existingBranch } : {}),
+          ...(pending.reworkOfTaskId ? { rework_of_task_id: pending.reworkOfTaskId } : {}),
         },
       });
+      const attachNote =
+        pending.attachments && pending.attachments.length > 0 ? ` 附带 ${pending.attachments.length} 个文件` : "";
+      const resumeNote = pending.reworkOfTaskId ? ` 续接 ${pending.reworkOfTaskId}` : "";
       return {
         ok: true,
         short_code: rec.short_code,
         task_id: pending.taskId,
-        message: `get 已批准 ${rec.short_code}\n工单 ${pending.taskId} 已派发到 ${pending.targetWorkerId} 项目 ${pending.project} 开始跑`,
+        message: `get 已批准 ${rec.short_code}\n工单 ${pending.taskId} 已派发到 ${pending.targetWorkerId} 项目 ${pending.project}${resumeNote}${attachNote} 开始跑`,
       };
     }
 
@@ -240,6 +369,212 @@ export class QqBridgeDaemon {
       ok: true,
       short_code: rec.short_code,
       message: `get 已批准 ${rec.short_code} 令牌 ${rec.approval_id} 已解锁`,
+    };
+  }
+
+  private async resolveResumeContext(taskId: string): Promise<{
+    project: string;
+    preferredDriver?: string;
+    existingBranch?: string;
+    resumeSessionId?: string;
+    targetWorkerId?: string;
+  } | null> {
+    const tasks = await this.options.mailroom.listTasks();
+    const prev = tasks.find((t) => t.task_id.toLowerCase() === taskId.toLowerCase());
+    if (!prev) return null;
+    let sessionId: string | undefined;
+    let branch: string | undefined = prev.branch ?? undefined;
+    if (prev.result_json) {
+      try {
+        const parsed = JSON.parse(prev.result_json) as { session_id?: string; branch?: string };
+        if (typeof parsed.session_id === "string" && parsed.session_id) sessionId = parsed.session_id;
+        if (!branch && typeof parsed.branch === "string" && parsed.branch) branch = parsed.branch;
+      } catch {
+        // ignore malformed result_json
+      }
+    }
+    return {
+      project: prev.project,
+      preferredDriver: prev.driver ?? undefined,
+      existingBranch: branch,
+      resumeSessionId: sessionId,
+      targetWorkerId: prev.assigned_to ?? undefined,
+    };
+  }
+
+  private async cancelRunningTask(
+    taskId: string,
+    reason?: string
+  ): Promise<{ ok: boolean; message: string; target_worker?: string }> {
+    const tasks = await this.options.mailroom.listTasks();
+    const rec = tasks.find((t) => t.task_id.toLowerCase() === taskId.toLowerCase());
+    const workers = (await this.options.mailroom.listAgents()).filter((a) => a.tier === "T2");
+    const targetWorker =
+      (rec?.assigned_to ? workers.find((w) => w.agent_id === rec.assigned_to) : undefined) ??
+      workers.find((w) => w.agent_id === this.options.defaultWorkerId) ??
+      workers.find((w) => w.online) ??
+      workers[0];
+    if (!targetWorker) {
+      return { ok: false, message: `找不到在线桌面工位 无法取消 ${taskId}` };
+    }
+    const cleanReason = reason?.trim() || "老板通过 QQ 请求中止";
+    await this.options.mailroom.sendEnvelope({
+      from: { agent_id: this.options.agentId, role: "secretary", tier: "T1" },
+      to: { agent_id: targetWorker.agent_id, role: "worker", tier: "T2" },
+      type: "task.cancel",
+      security: { risk_level: "L2" },
+      payload: {
+        task_id: rec?.task_id ?? taskId,
+        reason: cleanReason,
+      },
+    });
+    return {
+      ok: true,
+      target_worker: targetWorker.agent_id,
+      message: `已向 ${targetWorker.agent_id} 下发中止信号 取消工单 ${rec?.task_id ?? taskId}`,
+    };
+  }
+
+  private async dispatchOrQueueTask(params: {
+    bossQq: string;
+    project?: string;
+    instruction: string;
+    preferredDriver?: string;
+    resumeFromTaskId?: string;
+  }): Promise<{
+    ok: boolean;
+    status?: "PENDING_T0_APPROVAL" | "DISPATCHED";
+    task_id?: string;
+    short_code?: string;
+    target_worker?: string;
+    worker_online?: boolean;
+    attachment_count?: number;
+    resumed_session?: boolean;
+    message: string;
+    error?: string;
+  }> {
+    let project = params.project?.trim() ?? "";
+    let preferredDriver = params.preferredDriver?.trim() || undefined;
+    let resumeSessionId: string | undefined;
+    let existingBranch: string | undefined;
+    let reworkOfTaskId: string | undefined;
+    let preferredWorkerId: string | undefined;
+
+    if (params.resumeFromTaskId) {
+      const ctx = await this.resolveResumeContext(params.resumeFromTaskId);
+      if (!ctx) {
+        return {
+          ok: false,
+          error: `找不到历史工单 ${params.resumeFromTaskId}`,
+          message: `找不到历史工单 ${params.resumeFromTaskId} 无法续聊`,
+        };
+      }
+      if (!project) project = ctx.project;
+      if (!preferredDriver) preferredDriver = ctx.preferredDriver;
+      resumeSessionId = ctx.resumeSessionId;
+      existingBranch = ctx.existingBranch;
+      reworkOfTaskId = params.resumeFromTaskId;
+      preferredWorkerId = ctx.targetWorkerId;
+    }
+
+    if (!project) {
+      return { ok: false, error: "缺少目标项目名", message: "缺少目标项目名 请先指定白名单项目" };
+    }
+
+    const workers = (await this.options.mailroom.listAgents()).filter((a) => a.tier === "T2");
+    const targetWorker =
+      (preferredWorkerId ? workers.find((w) => w.agent_id === preferredWorkerId) : undefined) ??
+      workers.find((w) => w.agent_id === this.options.defaultWorkerId) ??
+      workers.find((w) => w.online && w.agent_id.startsWith("dispatcher")) ??
+      workers.find((w) => w.online) ??
+      workers[0];
+
+    if (!targetWorker) {
+      return {
+        ok: false,
+        error: "当前没有已注册的桌面工程师节点",
+        message: "当前没有已注册的桌面工程师节点 请先启动桌面工长",
+      };
+    }
+
+    const attachments = this.consumeBossArtifacts(params.bossQq);
+    const taskId = generateTaskId();
+    const riskLevel = this.options.defaultRiskLevel ?? "L3";
+    const attachNote = attachments.length > 0 ? ` 附带 ${attachments.length} 个文件` : "";
+    const resumeNote = reworkOfTaskId
+      ? ` 续接 ${reworkOfTaskId}${resumeSessionId ? "（复用会话上下文）" : ""}`
+      : "";
+
+    if (riskLevel === "L3") {
+      const pendingInfo: PendingDispatchRecord = {
+        taskId,
+        targetWorkerId: targetWorker.agent_id,
+        project,
+        instruction: params.instruction,
+        preferredDriver,
+        bossQq: params.bossQq,
+        resumeSessionId,
+        existingBranch,
+        reworkOfTaskId,
+        attachments: attachments.length > 0 ? attachments : undefined,
+      };
+      const apr = await this.options.mailroom.createApproval({
+        requested_by: this.options.agentId,
+        task_id: taskId,
+        risk_level: "L3",
+        action_summary: `[${project}${preferredDriver ? `/${preferredDriver}` : ""}${reworkOfTaskId ? ` 续:${reworkOfTaskId}` : ""}] ${params.instruction.slice(0, 180)}`,
+        metadata: { pending_dispatch: pendingInfo },
+      });
+      this.pendingL3Dispatches.set(apr.short_code, pendingInfo);
+      return {
+        ok: true,
+        status: "PENDING_T0_APPROVAL",
+        task_id: taskId,
+        short_code: apr.short_code,
+        target_worker: targetWorker.agent_id,
+        worker_online: targetWorker.online,
+        attachment_count: attachments.length,
+        resumed_session: Boolean(resumeSessionId),
+        message: [
+          `待老板审批 L3 短码 ${apr.short_code}`,
+          `工单 ${taskId} 目标 ${targetWorker.agent_id} ${targetWorker.online ? "在线" : "离线排队"}`,
+          `项目 ${project}${preferredDriver ? ` 工位 ${preferredDriver}` : ""}${resumeNote}${attachNote}`,
+          `内容 ${params.instruction.slice(0, 300)}`,
+          `回复 批准 ${apr.short_code} 放行 或回复 拒绝 ${apr.short_code} 取消`,
+        ].join("\n"),
+      };
+    }
+
+    await this.options.mailroom.sendEnvelope({
+      from: { agent_id: this.options.agentId, role: "secretary", tier: "T1" },
+      to: { agent_id: targetWorker.agent_id, role: "worker", tier: "T2" },
+      type: "task.dispatch",
+      security: { risk_level: riskLevel },
+      attachments,
+      payload: {
+        task_id: taskId,
+        project,
+        title: params.instruction.slice(0, 80),
+        instruction: params.instruction,
+        preferred_driver: preferredDriver,
+        sandbox_profile: riskLevel === "L1" ? "L1_READONLY" : "L2_WORKTREE_DEV",
+        ...(resumeSessionId ? { resume_session_id: resumeSessionId } : {}),
+        ...(existingBranch ? { existing_branch: existingBranch } : {}),
+        ...(reworkOfTaskId ? { rework_of_task_id: reworkOfTaskId } : {}),
+      },
+    });
+    const statusNote = targetWorker.online
+      ? "桌面工位在线 已下发开始跑"
+      : "桌面电脑目前离线 工单已入队 上线后自动跑";
+    return {
+      ok: true,
+      status: "DISPATCHED",
+      task_id: taskId,
+      target_worker: targetWorker.agent_id,
+      worker_online: targetWorker.online,
+      attachment_count: attachments.length,
+      resumed_session: Boolean(resumeSessionId),
+      message: `get 工单 ${taskId} 项目 ${project}${preferredDriver ? ` 工位 ${preferredDriver}` : ""}${resumeNote}${attachNote}\n${statusNote}`,
     };
   }
 
@@ -275,6 +610,40 @@ export class QqBridgeDaemon {
       return;
     }
 
+    // 1b. Direct task cancellation fast-path: "取消 T-xxxx [reason]" / "终止 T-xxxx"
+    const cancelMatch = text.match(/^(取消|终止|停止|cancel)\s+#?(T-[A-Za-z0-9_-]+)(?:\s+(.+))?$/i);
+    if (cancelMatch) {
+      try {
+        const res = await this.cancelRunningTask(cancelMatch[2]!, cancelMatch[3]);
+        await this.onebot.sendPrivateMessage(bossQq, res.message);
+      } catch (err) {
+        await this.onebot.sendPrivateMessage(
+          bossQq,
+          `取消失败 ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
+      return;
+    }
+
+    // 1c. Direct session resume fast-path: "续聊 T-xxxx <instruction>" / "resume T-xxxx <instruction>"
+    const resumeMatch = text.match(/^(续聊|继续|续接|resume)\s+#?(T-[A-Za-z0-9_-]+)\s+(.+)$/is);
+    if (resumeMatch) {
+      try {
+        const res = await this.dispatchOrQueueTask({
+          bossQq,
+          resumeFromTaskId: resumeMatch[2]!,
+          instruction: resumeMatch[3]!.trim(),
+        });
+        await this.onebot.sendPrivateMessage(bossQq, res.message);
+      } catch (err) {
+        await this.onebot.sendPrivateMessage(
+          bossQq,
+          `续聊派单失败 ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
+      return;
+    }
+
     // 2. Quick dispatch command: "派单 <project> [driver:<name>] <instruction>"
     const dispatchMatch = text.match(/^(派单|dispatch)\s+(\S+)\s+(.+)$/is);
     if (dispatchMatch) {
@@ -286,70 +655,13 @@ export class QqBridgeDaemon {
         preferredDriver = drvMatch[1]!;
         rest = drvMatch[2]!.trim();
       }
-      const workers = (await this.options.mailroom.listAgents()).filter((a) => a.tier === "T2");
-      const targetWorker =
-        workers.find((w) => w.agent_id === this.options.defaultWorkerId) ?? workers.find((w) => w.online) ?? workers[0];
-
-      if (!targetWorker) {
-        await this.onebot.sendPrivateMessage(bossQq, "[库米 O1] 当前没有已注册的桌面工程师节点，请先启动桌面工长。");
-        return;
-      }
-
-      const taskId = generateTaskId();
-      const riskLevel = this.options.defaultRiskLevel ?? "L2";
-
-      if (riskLevel === "L3") {
-        const pendingInfo = {
-          taskId,
-          targetWorkerId: targetWorker.agent_id,
-          project,
-          instruction: rest,
-          preferredDriver,
-          bossQq,
-        };
-        const apr = await this.options.mailroom.createApproval({
-          requested_by: this.options.agentId,
-          task_id: taskId,
-          risk_level: "L3",
-          action_summary: `[${project}${preferredDriver ? `/${preferredDriver}` : ""}] ${rest.slice(0, 200)}`,
-          metadata: { pending_dispatch: pendingInfo },
-        });
-        this.pendingL3Dispatches.set(apr.short_code, pendingInfo);
-        await this.onebot.sendPrivateMessage(
-          bossQq,
-          [
-            `待老板审批 L3 短码 ${apr.short_code}`,
-            `工单 ${taskId} 目标 ${targetWorker.agent_id} ${targetWorker.online ? "在线" : "离线排队"}`,
-            `项目 ${project}${preferredDriver ? ` 工位 ${preferredDriver}` : ""}`,
-            `内容 ${rest.slice(0, 300)}`,
-            `回复 批准 ${apr.short_code} 放行 或回复 拒绝 ${apr.short_code} 取消`,
-          ].join("\n")
-        );
-        return;
-      }
-
-      await this.options.mailroom.sendEnvelope({
-        from: { agent_id: this.options.agentId, role: "secretary", tier: "T1" },
-        to: { agent_id: targetWorker.agent_id, role: "worker", tier: "T2" },
-        type: "task.dispatch",
-        security: { risk_level: riskLevel },
-        payload: {
-          task_id: taskId,
-          project,
-          title: rest.slice(0, 80),
-          instruction: rest,
-          preferred_driver: preferredDriver,
-          sandbox_profile: riskLevel === "L1" ? "L1_READONLY" : "L2_WORKTREE_DEV",
-        },
-      });
-
-      const statusNote = targetWorker.online
-        ? "桌面工位在线 已下发开始跑"
-        : "桌面电脑目前离线 工单已入队 上线后自动跑";
-      await this.onebot.sendPrivateMessage(
+      const res = await this.dispatchOrQueueTask({
         bossQq,
-        `get 工单 ${taskId} 项目 ${project}${preferredDriver ? ` 工位 ${preferredDriver}` : ""}\n${statusNote}`
-      );
+        project,
+        instruction: rest,
+        preferredDriver,
+      });
+      await this.onebot.sendPrivateMessage(bossQq, res.message);
       return;
     }
 
@@ -393,11 +705,13 @@ export class QqBridgeDaemon {
       await this.onebot.sendPrivateMessage(
         bossQq,
         [
-          "[库米 O1 · 指挥指令速查]",
-          "1. 派单 <项目名> [driver:dsh|agy|claude|codex|zcode] <任务描述>",
-          "2. 批准 <短码> / 拒绝 <短码> [理由]",
-          "3. 当前在线节点：",
-          summary || "(暂无)",
+          "库米 O1 指挥指令速查",
+          "1 派单 <项目名> [driver:dsh|agy|claude|codex|zcode] <任务描述>（先发文件会自动附带）",
+          "2 续聊 <工单号> <继续要求>（自动继承原分支与 session）",
+          "3 取消 <工单号> [原因]（强杀运行中任务）",
+          "4 批准 <短码> / 拒绝 <短码> [理由]",
+          "当前在线节点",
+          summary || "暂无",
         ].join("\n")
       );
     }
@@ -407,6 +721,7 @@ export class QqBridgeDaemon {
     const agents = await this.options.mailroom.listAgents();
     const workers = agents.filter((a) => a.tier === "T2");
     const pendingApprovals = await this.options.mailroom.listApprovals("pending");
+    const recentFiles = this.pruneBossArtifacts(bossQq);
     const defaultRisk = this.options.defaultRiskLevel ?? "L3";
 
     const workerContext = workers
@@ -428,11 +743,15 @@ export class QqBridgeDaemon {
       pendingApprovals.length > 0
         ? `待老板审批的 L3 短码：\n${pendingApprovals.map((a, i) => `${i + 1} ${a.short_code} ${a.action_summary}`).join("\n")}`
         : "当前无待审批短码",
+      recentFiles.length > 0
+        ? `老板刚上传的待附带文件（下次派单将自动转给桌面 CLI）：${recentFiles.map((f) => `${f.ref.filename}(${Math.max(1, Math.round(f.ref.size_bytes / 1024))}KB)`).join(", ")}`
+        : "当前无待附带文件",
       "工具使用约定：",
       "1 查节点或任务状态时先调工具 拿到真实数据再简洁回复",
-      "2 老板明确让桌面干活时调 dispatch_desktop_task 注意 project 必须用白名单准确名称 信息太模糊就先问不猜",
+      "2 老板明确让桌面干活时调 dispatch_desktop_task 注意 project 必须用白名单准确名称；若是接着上次任务继续改 可填 resume_from_task_id",
       "3 老板回复授权 批准 同意或拒绝待审批工单时 调 approve_or_reject_pending 工具",
-      "4 再次自检 绝对不要输出任何 Markdown 符号（** ### ``` ` - 等） 只发正常纯文本",
+      "4 老板要中止正在跑的任务时 调 cancel_running_task 工具",
+      "5 再次自检 绝对不要输出任何 Markdown 符号（** ### ``` ` - 等） 只发正常纯文本",
     ].join("\n");
 
     const tools: ToolDefinition[] = [
@@ -456,18 +775,38 @@ export class QqBridgeDaemon {
         type: "function",
         function: {
           name: "dispatch_desktop_task",
-          description: "向桌面工位派发工程任务（若默认 L3 策略开启，会自动创建待老板确认的短码审批单）。",
+          description:
+            "向桌面工位派发工程任务（支持自动附带老板刚发的 QQ 文件；支持传 resume_from_task_id 续接历史任务的会话与分支；若默认 L3 策略开启则先生成短码审批单）。",
           parameters: {
             type: "object",
             properties: {
               project: {
                 type: "string",
-                description: "白名单中的项目名，例如 coomi / qmmi / harness-deck",
+                description: "白名单中的项目名，例如 harness-deck / UltraCausal（若填了 resume_from_task_id 可留空自动继承）",
               },
               instruction: { type: "string", description: "清晰具体的任务要求" },
-              preferred_driver: { type: "string", description: "可选，指定工程师 CLI：dsh / agy / mock" },
+              preferred_driver: { type: "string", description: "可选，指定工程师 CLI：dsh / agy / claude / codex / mock" },
+              resume_from_task_id: {
+                type: "string",
+                description: "可选，要续聊或返工的历史工单号（如 T-123456），会自动复用原项目、分支与 sessionId",
+              },
             },
-            required: ["project", "instruction"],
+            required: ["instruction"],
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "cancel_running_task",
+          description: "老板要求强行停止或取消正在执行的桌面任务时调用。",
+          parameters: {
+            type: "object",
+            properties: {
+              task_id: { type: "string", description: "要中止的工单号（如 T-xxxx）" },
+              reason: { type: "string", description: "可选取消原因" },
+            },
+            required: ["task_id"],
           },
         },
       },
@@ -498,65 +837,26 @@ export class QqBridgeDaemon {
         const comment = args.comment ? String(args.comment) : undefined;
         return this.executeApprovalDecision(bossQq, code, decision, comment);
       },
+      cancel_running_task: async (args) => {
+        const taskId = String(args.task_id ?? "").trim();
+        const reason = args.reason ? String(args.reason) : undefined;
+        if (!taskId) return { ok: false, error: "缺少要取消的 task_id" };
+        return this.cancelRunningTask(taskId, reason);
+      },
       dispatch_desktop_task: async (args) => {
-        const project = String(args.project ?? "");
-        const instruction = String(args.instruction ?? "");
-        const preferredDriver = args.preferred_driver ? String(args.preferred_driver) : undefined;
-        const latestWorkers = (await this.options.mailroom.listAgents()).filter((a) => a.tier === "T2");
-        const targetWorker =
-          latestWorkers.find((w) => w.agent_id === this.options.defaultWorkerId) ??
-          latestWorkers.find((w) => w.online && w.agent_id.startsWith("dispatcher")) ??
-          latestWorkers.find((w) => w.online) ??
-          latestWorkers[0];
-
-        if (!targetWorker) {
-          return { ok: false, error: "当前没有可用的桌面工程师节点。" };
-        }
-
-        const taskId = generateTaskId();
-        if (defaultRisk === "L3") {
-          const pendingInfo = {
-            taskId,
-            targetWorkerId: targetWorker.agent_id,
-            project,
-            instruction,
-            preferredDriver,
-            bossQq,
-          };
-          const apr = await this.options.mailroom.createApproval({
-            requested_by: this.options.agentId,
-            task_id: taskId,
-            risk_level: "L3",
-            action_summary: `[${project}${preferredDriver ? `/${preferredDriver}` : ""}] ${instruction.slice(0, 200)}`,
-            metadata: { pending_dispatch: pendingInfo },
-          });
-          this.pendingL3Dispatches.set(apr.short_code, pendingInfo);
-          return {
-            ok: true,
-            status: "PENDING_T0_APPROVAL",
-            task_id: taskId,
-            short_code: apr.short_code,
-            target_worker: targetWorker.agent_id,
-            worker_online: targetWorker.online,
-            instruction_for_boss: `请回复「批准 ${apr.short_code}」放行执行，或回复「拒绝 ${apr.short_code}」取消。`,
-          };
-        }
-
-        await this.options.mailroom.sendEnvelope({
-          from: { agent_id: this.options.agentId, role: "secretary", tier: "T1" },
-          to: { agent_id: targetWorker.agent_id, role: "worker", tier: "T2" },
-          type: "task.dispatch",
-          security: { risk_level: defaultRisk },
-          payload: {
-            task_id: taskId,
-            project,
-            title: instruction.slice(0, 80),
-            instruction,
-            preferred_driver: preferredDriver,
-            sandbox_profile: defaultRisk === "L1" ? "L1_READONLY" : "L2_WORKTREE_DEV",
-          },
+        const res = await this.dispatchOrQueueTask({
+          bossQq,
+          project: args.project ? String(args.project) : undefined,
+          instruction: String(args.instruction ?? ""),
+          preferredDriver: args.preferred_driver ? String(args.preferred_driver) : undefined,
+          resumeFromTaskId: args.resume_from_task_id ? String(args.resume_from_task_id) : undefined,
         });
-        return { ok: true, status: "DISPATCHED", task_id: taskId, target_worker: targetWorker.agent_id };
+        return {
+          ...res,
+          ...(res.short_code
+            ? { instruction_for_boss: `请回复 批准 ${res.short_code} 放行执行 或回复 拒绝 ${res.short_code} 取消` }
+            : {}),
+        };
       },
     };
 
@@ -695,6 +995,17 @@ export class QqBridgeDaemon {
         ...lines,
         `要安排修复直接说项目和要求`,
       ].join("\n");
+    } else if (env.type === "task.progress") {
+      const p = env.payload;
+      const taskId = String(p.task_id ?? "");
+      if (!p.heartbeat || !taskId) return;
+      const lastAt = this.lastProgressNotifyAt.get(taskId) ?? 0;
+      if (Date.now() - lastAt < 55_000) return;
+      this.lastProgressNotifyAt.set(taskId, Date.now());
+      const driver = String(p.driver ?? "cli");
+      const elapsed = p.elapsed_sec ? `${String(p.elapsed_sec)}s` : "";
+      const stage = String(p.stage ?? "running");
+      text = `运行中 ${taskId}（${driver}${elapsed ? ` 已跑 ${elapsed}` : ""} 阶段 ${stage}） 如需中止回复 取消 ${taskId}`;
     } else if (env.type === "qa.escalation") {
       text = `Coomi K1 上报未命中知识库的问题\n项目 ${String(env.payload.project ?? "")}\n问题 ${String(env.payload.question_summary ?? "")}`;
     } else {

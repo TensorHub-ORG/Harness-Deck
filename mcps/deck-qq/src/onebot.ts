@@ -32,14 +32,136 @@ export function formatPlainTextForQq(input: string): string {
 }
 export interface OneBotEvent {
   post_type: string;
+  notice_type?: string;
   message_type?: "private" | "group";
   sub_type?: string;
   user_id?: number;
   group_id?: number;
   raw_message?: string;
   message?: unknown;
+  file?: {
+    id?: string;
+    name?: string;
+    size?: number;
+    url?: string;
+    file?: string;
+    busid?: number;
+  };
   sender?: { nickname?: string; card?: string; user_id?: number };
   time?: number;
+}
+
+export interface InboundMediaItem {
+  kind: "file" | "image";
+  filename: string;
+  fileId?: string;
+  url?: string;
+  localPath?: string;
+}
+
+function unescapeCqValue(val: string): string {
+  return val
+    .replace(/&#91;/g, "[")
+    .replace(/&#93;/g, "]")
+    .replace(/&#44;/g, ",")
+    .replace(/&amp;/g, "&");
+}
+
+function parseCqParams(paramStr: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const part of paramStr.split(",")) {
+    const eq = part.indexOf("=");
+    if (eq <= 0) continue;
+    const k = part.slice(0, eq).trim();
+    const v = unescapeCqValue(part.slice(eq + 1).trim());
+    out[k] = v;
+  }
+  return out;
+}
+
+/**
+ * Extracts clean text + inbound file/image references from OneBot v11 message or offline_file notice events.
+ */
+export function extractInboundMedia(ev: OneBotEvent): { text: string; files: InboundMediaItem[] } {
+  const files: InboundMediaItem[] = [];
+  const seen = new Set<string>();
+  const pushItem = (item: InboundMediaItem) => {
+    const key = `${item.kind}:${item.fileId ?? ""}:${item.url ?? ""}:${item.localPath ?? ""}:${item.filename}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    files.push(item);
+  };
+
+  if (ev.post_type === "notice" && ev.notice_type === "offline_file" && ev.file) {
+    pushItem({
+      kind: "file",
+      filename: ev.file.name || "qq_offline_file",
+      fileId: ev.file.id,
+      url: ev.file.url,
+      localPath: ev.file.file && !/^https?:\/\//i.test(ev.file.file) ? ev.file.file : undefined,
+    });
+    return { text: "", files };
+  }
+
+  const textParts: string[] = [];
+  if (Array.isArray(ev.message)) {
+    for (const seg of ev.message) {
+      if (!seg || typeof seg !== "object") continue;
+      const s = seg as { type?: string; data?: Record<string, unknown> };
+      const d = s.data ?? {};
+      if (s.type === "text" && typeof d.text === "string") {
+        textParts.push(d.text);
+      } else if (s.type === "file") {
+        const rawFile = typeof d.file === "string" ? d.file : undefined;
+        const rawPath = typeof d.path === "string" ? d.path : undefined;
+        const name = String(d.name ?? (rawFile ? rawFile.split(/[\\/]/).pop() : "qq_file"));
+        pushItem({
+          kind: "file",
+          filename: name || "qq_file",
+          fileId: typeof d.file_id === "string" ? d.file_id : undefined,
+          url: typeof d.url === "string" ? d.url : undefined,
+          localPath: rawPath ?? (rawFile && /[\\/]/.test(rawFile) && !/^https?:\/\//i.test(rawFile) ? rawFile : undefined),
+        });
+      } else if (s.type === "image") {
+        const rawFile = typeof d.file === "string" ? d.file : undefined;
+        const name = String(d.filename ?? d.file ?? "qq_image.png").split(/[\\/]/).pop() || "qq_image.png";
+        pushItem({
+          kind: "image",
+          filename: name.includes(".") ? name : `${name}.png`,
+          fileId: typeof d.file_id === "string" ? d.file_id : undefined,
+          url: typeof d.url === "string" ? d.url : undefined,
+          localPath: rawFile && /[\\/]/.test(rawFile) && !/^https?:\/\//i.test(rawFile) ? rawFile : undefined,
+        });
+      }
+    }
+  }
+
+  const raw = typeof ev.raw_message === "string" ? ev.raw_message : "";
+  if (raw) {
+    const cqRegex = /\[CQ:(file|image),([^\]]+)\]/g;
+    let m: RegExpExecArray | null;
+    while ((m = cqRegex.exec(raw)) !== null) {
+      const kind = m[1] as "file" | "image";
+      const params = parseCqParams(m[2] ?? "");
+      const rawFile = params.file;
+      const defaultName = kind === "image" ? "qq_image.png" : "qq_file";
+      const name = (params.name || params.filename || rawFile?.split(/[\\/]/).pop() || defaultName).trim();
+      pushItem({
+        kind,
+        filename: kind === "image" && !name.includes(".") ? `${name}.png` : name,
+        fileId: params.file_id,
+        url: params.url,
+        localPath: params.path || (rawFile && /[\\/]/.test(rawFile) && !/^https?:\/\//i.test(rawFile) ? rawFile : undefined),
+      });
+    }
+  }
+
+  const cleanText =
+    textParts.length > 0
+      ? textParts.join("").trim()
+      : raw.replace(/\[CQ:(?:file|image),[^\]]+\]/g, "").trim();
+
+  return { text: cleanText, files };
 }
 
 export interface OneBotClientOptions {
@@ -190,6 +312,10 @@ export class OneBotClient {
       file: filePath,
       name,
     });
+  }
+
+  public async getFile(fileId: string): Promise<Record<string, unknown>> {
+    return this.callAction("get_file", { file_id: fileId });
   }
 
   public async getGroupList(): Promise<Record<string, unknown>> {

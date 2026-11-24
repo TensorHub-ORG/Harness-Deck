@@ -15,6 +15,7 @@ fs.mkdirSync(outDir, { recursive: true });
 
 const includeEntries = [
   "START_HERE.md",
+  "AGENTS.md",
   "README.md",
   "package.json",
   "pnpm-workspace.yaml",

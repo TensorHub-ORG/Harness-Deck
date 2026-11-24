@@ -23,6 +23,7 @@ import {
 } from "@harness-deck/dispatcher";
 import { QqBridgeDaemon } from "@harness-deck/mcp-qq/bridge";
 import { runRemoteSshDeploy } from "./deploy-ssh.js";
+import { collectStackStatus, manageDaemonAutostart, runSupervisor } from "./supervisor.js";
 
 function loadDotEnv(envPath = ".env"): void {
   const abs = path.resolve(envPath);
@@ -678,12 +679,150 @@ async function cmdMcpConfig(flags: Record<string, string | boolean>): Promise<vo
   console.log(JSON.stringify({ mcpServers }, null, 2));
 }
 
+async function cmdStatus(flags: Record<string, string | boolean>): Promise<void> {
+  loadDotEnv();
+  const report = await collectStackStatus(process.cwd());
+  if (flags.json) {
+    console.log(JSON.stringify(report, null, 2));
+    return;
+  }
+
+  console.log(`\n=== Harness-Deck Live Status (${report.mode.toUpperCase()}) ===`);
+  console.log(`Endpoint:   ${report.endpoint}`);
+  console.log(`Mailroom:   ${report.mailroom.ok ? "OK" : `ERROR (${report.mailroom.error ?? "unreachable"})`}`);
+  console.log(
+    `NapCat O1:  ${
+      report.napcat.o1.configured
+        ? `${report.napcat.o1.reachable ? "ONLINE" : "OFFLINE"} (${report.napcat.o1.url})`
+        : "(not configured)"
+    }`
+  );
+  if (report.napcat.k1.configured) {
+    console.log(`NapCat K1:  ${report.napcat.k1.reachable ? "ONLINE" : "OFFLINE"} (${report.napcat.k1.url})`);
+  }
+  console.log(
+    `Supervisor: ${
+      report.supervisor.running
+        ? `RUNNING (pid=${report.supervisor.pid}, since ${report.supervisor.started_at})`
+        : "not running via `deck up`"
+    }`
+  );
+  console.log(
+    `Workstation: ${
+      report.workstation.exists
+        ? `${report.workstation.node_id ?? "configured"} | projects=[${report.workstation.workspaces.join(", ")}] | CLIs=[${report.workstation.enabled_engineers.join(", ")}] | worktrees=${report.workstation.active_worktrees}`
+        : "(missing .deck/workstation.yaml)"
+    }`
+  );
+
+  if (report.mailroom.agents.length > 0) {
+    console.log("\nRegistered Agents:");
+    for (const a of report.mailroom.agents) {
+      console.log(`  [${a.online ? "ONLINE " : "OFFLINE"}] ${a.tier} ${a.agent_id.padEnd(28)} (${a.role})`);
+    }
+  }
+  if (report.mailroom.pending_approvals.length > 0) {
+    console.log("\nPending L3 Approvals:");
+    for (const apr of report.mailroom.pending_approvals) {
+      console.log(`  - ${apr.short_code} (${apr.task_id ?? "-"}) ${apr.action_summary}`);
+    }
+  }
+  if (report.mailroom.recent_tasks.length > 0) {
+    console.log("\nRecent Tasks:");
+    for (const t of report.mailroom.recent_tasks) {
+      console.log(`  - ${t.task_id} [${t.status}] ${t.project} (${t.driver ?? "-"})`);
+    }
+  }
+  console.log("");
+}
+
+async function cmdUp(flags: Record<string, string | boolean>): Promise<void> {
+  loadDotEnv();
+  const profile = strFlag(flags, "profile", "o1") === "k1" ? "k1" : "o1";
+  const cliEntryPath = path.resolve(process.cwd(), "packages", "cli", "dist", "index.js");
+  await runSupervisor({
+    repoRoot: process.cwd(),
+    cliEntryPath,
+    profile,
+    withRelay: Boolean(flags["with-relay"]),
+    includeQq: !Boolean(flags["no-qq"]),
+    includeDispatch: !Boolean(flags["no-dispatch"]),
+    includeTunnel: !Boolean(flags["no-tunnel"]),
+  });
+}
+
+async function cmdDaemon(actionArg: string | undefined, flags: Record<string, string | boolean>): Promise<void> {
+  loadDotEnv();
+  const action = actionArg === "install" || actionArg === "uninstall" ? actionArg : "script";
+  const profile = strFlag(flags, "profile", "o1") === "k1" ? "k1" : "o1";
+  const apply = Boolean(flags.apply);
+  const cliEntryPath = path.resolve(process.cwd(), "packages", "cli", "dist", "index.js");
+  const res = manageDaemonAutostart({
+    action,
+    repoRoot: process.cwd(),
+    cliEntryPath,
+    profile,
+    apply,
+  });
+  console.log(JSON.stringify(res, null, 2));
+  if (!res.applied && action !== "script") {
+    console.log("\nDry-run preview complete. Re-run with `--apply` to register/remove OS autostart.");
+  }
+}
+
+async function cmdCancel(taskId: string | undefined, reason?: string): Promise<void> {
+  loadDotEnv();
+  if (!taskId) {
+    console.error("Usage: deck cancel <task_id> [reason]");
+    process.exit(1);
+  }
+  const client = createMailroomClient(
+    process.env.DECK_ENDPOINT,
+    process.env.DECK_TOKEN_KUMI_O1 ?? process.env.DECK_TOKEN_BOSS
+  );
+  try {
+    const tasks = await client.listTasks();
+    const rec = tasks.find((t) => t.task_id.toLowerCase() === taskId.toLowerCase());
+    const workers = (await client.listAgents()).filter((a) => a.tier === "T2");
+    const target =
+      (rec?.assigned_to ? workers.find((w) => w.agent_id === rec.assigned_to) : undefined) ??
+      workers.find((w) => w.online) ??
+      workers[0];
+    if (!target) {
+      console.error("No registered T2 worker found to cancel task.");
+      process.exit(1);
+    }
+    const env = await client.sendEnvelope({
+      from: { agent_id: "kumi-o1", role: "secretary", tier: "T1" },
+      to: { agent_id: target.agent_id, role: "worker", tier: "T2" },
+      type: "task.cancel",
+      security: { risk_level: "L2" },
+      payload: {
+        task_id: rec?.task_id ?? taskId,
+        reason: reason || "Cancelled via deck CLI",
+      },
+    });
+    console.log(JSON.stringify({ ok: true, envelope_id: env.id, task_id: rec?.task_id ?? taskId, target: target.agent_id }, null, 2));
+  } finally {
+    client.close();
+  }
+}
+
 const { positionals, flags } = parseFlags(process.argv.slice(2));
 const cmd = positionals[0];
 
 switch (cmd) {
   case "scan":
     await cmdScan(flags);
+    break;
+  case "status":
+    await cmdStatus(flags);
+    break;
+  case "up":
+    await cmdUp(flags);
+    break;
+  case "daemon":
+    await cmdDaemon(positionals[1], flags);
     break;
   case "init":
     await cmdInit(flags);
@@ -715,6 +854,9 @@ switch (cmd) {
   case "reject":
     await cmdApproval("rejected", positionals[1], positionals.slice(2).join(" ") || undefined);
     break;
+  case "cancel":
+    await cmdCancel(positionals[1], positionals.slice(2).join(" ") || undefined);
+    break;
   case "mcp-config":
     await cmdMcpConfig(flags);
     break;
@@ -724,6 +866,11 @@ Harness-Deck CLI (HDP v1)
 
 Commands:
   deck scan [--json]                         Detect OS, Docker, SSH & installed desktop CLIs (dsh/claude/codex/agy/zcode/coomi)
+  deck status [--json]                       1-second health report across Mailroom/Relay, NapCat, Workstation, approvals & tasks
+  deck up [--profile o1|k1] [--with-relay] [--no-qq] [--no-dispatch] [--no-tunnel]
+                                             Run supervised local stack with auto-restart watchdog & runtime-status.json
+  deck daemon <script|install|uninstall> [--profile o1|k1] [--apply]
+                                             Generate or register OS autostart (Windows Scheduled Task / Linux systemd --user)
   deck init [--mode local|remote] [--scope o1_only|o1_and_k1] [--boss-qq ...] [--groups ...]
                                              Initialize .env, workstation.yaml, Mailroom agents & MCP client configs
   deck relay [--host 0.0.0.0] [--port 8787]  Start lightweight cross-machine Mailroom relay server
@@ -734,6 +881,7 @@ Commands:
   deck trace <trace_id>                      Inspect full audit trail for a trace_id
   deck mock <secretary|k1|engineer>          Simulate roles for independent module development
   deck approve|reject <code> [comment]       T0 Boss approval decision for L3 actions
+  deck cancel <task_id> [reason]             Send live task.cancel signal to stop a running desktop task
   deck mcp-config [--role worker|secretary|frontline|boss]
                                              Print standard mcpServers JSON for any Agent tool
 `);

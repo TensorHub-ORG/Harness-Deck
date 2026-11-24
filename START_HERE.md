@@ -24,6 +24,7 @@
 | 目录 / 文件 | 用途 | 适用阶段 |
 | :--- | :--- | :--- |
 | [`skills/deck-onboarding/SKILL.md`](skills/deck-onboarding/SKILL.md) | **0 基础交互式总装机向导**（必读） | Day-0 初始化 |
+| [`skills/deck-pilot/SKILL.md`](skills/deck-pilot/SKILL.md) | **日常驾驭与运维控制台**（状态体检、一键守护、派单/续聊/取消、审批排障） | 日常高频使用 |
 | [`skills/deck-install-qq/SKILL.md`](skills/deck-install-qq/SKILL.md) | `Qmmi + NapCat` 本地 / 远程 SSH 双分支部署剧本 | 场景一 / 二 |
 | [`skills/deck-connect-engineers/SKILL.md`](skills/deck-connect-engineers/SKILL.md) | 桌面 CLI 工程师扫描、Worktree 隔离与 MCP 自动装配 | 场景一 |
 | [`skills/deck-role-o1/SKILL.md`](skills/deck-role-o1/SKILL.md) | **库米 O1（`T1` 秘书主管）** 行为规范与调度手册 | 运行态 O1 |

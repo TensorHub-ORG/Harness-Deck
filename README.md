@@ -26,6 +26,7 @@
 - **极简双模传输（无重型中台）**：
   - **同机零服务模式**：本地 `node:sqlite` + 共享目录，无需启动任何后台服务。
   - **跨端中继模式**：云服务器起一个轻量 `deck-relay`（HTTP + WebSocket），桌面端主动出站连接，免公网 IP / 内网穿透。
+- **开箱即用的日常驾驭体验**：`pnpm deck status` 1 秒链路体检、`pnpm deck up` 一键看门狗守护与 `pnpm deck daemon` 开机自启、QQ 双向文件流（发 PDF/截图/日志给 O1 自动喂给桌面 CLI）、长任务阶段心跳、QQ `续聊 T-xxxx` 会话续接与 `取消 T-xxxx` 强杀中断，并附带日常运维 Skill [`skills/deck-pilot/SKILL.md`](skills/deck-pilot/SKILL.md)。
 - **开箱即用的 10 项工程安全防护**：Git Worktree 隔离、3 档无头沙箱、Windows/POSIX 进程树超时清理、电脑离线队列 + TTL + 幂等键、QQ 防风控节流与超长转文件、Secret Scrubber 密钥脱敏、防死循环 `max_hops` 熔断、`trace_id` 全链路审计、记忆三分区、3 人并行 Mock 替身。
 
 ---
@@ -53,6 +54,10 @@ pnpm deck init --mode local
 
 # 运行全链路端到端自检（包含 RBAC 硬拦截验证、密钥脱敏验证、Mock 工程师全流程闭环）
 pnpm deck doctor
+
+# 日常 1 秒体检全链路状态 / 一键看门狗拉起全套本地服务
+pnpm deck status
+pnpm deck up --profile o1
 ```
 
 ### 方式三：打包成便携整合包分发给团队或任意机器
@@ -66,7 +71,9 @@ pnpm pack:bundle
 
 ## 文档导航
 
-- 🧭 Agent 引导入口：[`START_HERE.md`](START_HERE.md)
+- 🧭 Agent 0 基础装机引导入口：[`START_HERE.md`](START_HERE.md)
+- 🎛️ Agent 日常驾驭与运维 Skill：[`skills/deck-pilot/SKILL.md`](skills/deck-pilot/SKILL.md)
+- 🤖 新会话 Agent 极速接手（A2A 上下文交接文档）：[`docs/A2A_HANDOFF.md`](docs/A2A_HANDOFF.md)（自动发现入口：[`AGENTS.md`](AGENTS.md)）
 - 🏗️ 完整架构蓝图：[`docs/BLUEPRINT.md`](docs/BLUEPRINT.md)
 - 📜 HDP v1 协议规范与安全模型：[`docs/PROTOCOL.md`](docs/PROTOCOL.md)
 - 🤝 团队 0 基础协作开发指南：[`docs/CONTRIBUTING_ZERO_TO_ONE.md`](docs/CONTRIBUTING_ZERO_TO_ONE.md)

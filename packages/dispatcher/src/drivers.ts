@@ -19,6 +19,13 @@ export interface BuiltCommand {
   env?: Record<string, string>;
 }
 
+export interface MaterializedInputFile {
+  filename: string;
+  localPath: string;
+  mimeType: string;
+  sizeBytes: number;
+}
+
 export interface DriverSpec {
   id: DriverId;
   defaultBinary: string;
@@ -30,6 +37,7 @@ export interface DriverSpec {
     sandbox: SandboxProfile;
     task: TaskDispatchPayload;
     cwd: string;
+    extraDirs?: string[];
     commandTemplate?: string[];
   }): BuiltCommand;
   parseProgressLine?(line: string): { stage?: string; sessionId?: string } | null;
@@ -59,7 +67,12 @@ export function unwrapWindowsNpmShim(binary: string): { command: string; prefixA
   return { command: binary, prefixArgs: [] };
 }
 
-export function buildTaskPrompt(task: TaskDispatchPayload, handoffNote?: string): string {
+export function buildTaskPrompt(
+  task: TaskDispatchPayload,
+  handoffOrOpts?: string | { handoffNote?: string; inputFiles?: MaterializedInputFile[] }
+): string {
+  const handoffNote = typeof handoffOrOpts === "string" ? handoffOrOpts : handoffOrOpts?.handoffNote;
+  const inputFiles = typeof handoffOrOpts === "string" ? undefined : handoffOrOpts?.inputFiles;
   const lines = [
     `[Harness-Deck Task ${task.task_id}] Project: ${task.project}`,
     `Title: ${task.title}`,
@@ -68,6 +81,12 @@ export function buildTaskPrompt(task: TaskDispatchPayload, handoffNote?: string)
     "Instruction:",
     task.instruction,
   ];
+  if (inputFiles && inputFiles.length > 0) {
+    lines.push("", "Attached Input Files (downloaded from Boss / Mailroom; read these local paths directly):");
+    for (const f of inputFiles) {
+      lines.push(`- ${f.filename} (${f.mimeType}, ${f.sizeBytes} bytes) -> ${f.localPath}`);
+    }
+  }
   if (handoffNote) {
     lines.push("", "Additional Context / Previous Feedback:", handoffNote);
   }
@@ -87,7 +106,7 @@ export const BUILTIN_DRIVERS: Record<DriverId, DriverSpec> = {
     defaultBinary: "dsh",
     aliases: ["dsh"],
     supportsResume: true,
-    buildCommand({ binary, prompt, sandbox, task, cwd }) {
+    buildCommand({ binary, prompt, sandbox, task, cwd, extraDirs }) {
       const { command, prefixArgs } = unwrapWindowsNpmShim(binary);
       const profile = process.env.DECK_DSH_PROFILE || "headless";
       const args = [...prefixArgs, "--profile", profile];
@@ -99,6 +118,9 @@ export const BUILTIN_DRIVERS: Record<DriverId, DriverSpec> = {
         args.push("--permission-mode", "read-only");
       } else {
         args.push("--add-dir", cwd);
+      }
+      for (const dir of extraDirs ?? []) {
+        args.push("--add-dir", dir);
       }
       if (task.resume_session_id) {
         args.push("--session-id", task.resume_session_id);
@@ -201,7 +223,7 @@ export const BUILTIN_DRIVERS: Record<DriverId, DriverSpec> = {
     defaultBinary: "agy",
     aliases: ["agy", "antigravity"],
     supportsResume: true,
-    buildCommand({ binary, prompt, sandbox, task, cwd }) {
+    buildCommand({ binary, prompt, sandbox, task, cwd, extraDirs }) {
       const args = ["--print", prompt, "--output-format", "text", "--print-timeout", `${task.timeout_sec}s`];
       if (sandbox === "L1_READONLY") {
         args.push("--mode", "plan");
@@ -209,6 +231,9 @@ export const BUILTIN_DRIVERS: Record<DriverId, DriverSpec> = {
         args.push("--mode", "accept-edits", "--add-dir", cwd);
       } else {
         args.push("--mode", "auto", "--dangerously-skip-permissions", "--add-dir", cwd);
+      }
+      for (const dir of extraDirs ?? []) {
+        args.push("--add-dir", dir);
       }
       if (task.resume_session_id) {
         args.push("--conversation", task.resume_session_id);

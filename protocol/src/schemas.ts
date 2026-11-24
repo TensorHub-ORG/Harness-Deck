@@ -118,6 +118,8 @@ export const TaskProgressPayloadSchema = z.object({
   stage: z.string().min(1).max(200),
   percent: z.number().min(0).max(100).optional(),
   detail: z.string().max(1000).optional(),
+  elapsed_sec: z.number().int().nonnegative().optional(),
+  heartbeat: z.boolean().optional(),
 });
 export type TaskProgressPayload = z.infer<typeof TaskProgressPayloadSchema>;
 

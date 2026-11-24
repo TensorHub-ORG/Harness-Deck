@@ -11,7 +11,7 @@ import {
   scrubSecrets,
 } from "@harness-deck/protocol";
 import { MailroomClient } from "@harness-deck/mailroom";
-import { BUILTIN_DRIVERS, DriverId, buildTaskPrompt, resolveDriverSpec } from "./drivers.js";
+import { BUILTIN_DRIVERS, DriverId, MaterializedInputFile, buildTaskPrompt, resolveDriverSpec } from "./drivers.js";
 import { WorktreeManager } from "./worktree.js";
 
 export function loadWorkstationConfig(configPath: string): WorkstationConfig {
@@ -57,6 +57,7 @@ export interface DispatcherOptions {
   agentId?: string;
   secretaryId?: string;
   pollIntervalMs?: number;
+  heartbeatIntervalMs?: number;
   logger?: (msg: string) => void;
 }
 
@@ -65,7 +66,9 @@ export interface DispatcherOptions {
  * - Registers workstation capabilities & allowlisted workspaces with Mailroom
  * - Receives `task.dispatch` & `task.cancel` over outbound WebSocket or local polling
  * - Creates isolated `git worktree` per L2/L3 task
+ * - Materializes inbound Mailroom attachments for CLI engineers (QQ -> Desktop file flow)
  * - Supervises CLI engineers (dsh / claude / codex / agy / zcode / coomi / custom / mock)
+ * - Emits periodic heartbeats on long-running tasks and reports clean `cancelled` status
  * - Guarantees result delivery via Dual-Insurance Fallback (active MCP OR auto-synthesized capture)
  */
 export class DeckDispatcher {
@@ -74,6 +77,7 @@ export class DeckDispatcher {
   private readonly worktrees: WorktreeManager;
   private readonly activeChildren = new Map<string, ChildProcess>();
   private readonly runningTasks = new Set<string>();
+  private readonly cancelledTasks = new Map<string, string>();
   private readonly processingEnvelopeIds = new Set<string>();
   private readonly log: (msg: string) => void;
   private pollTimer: NodeJS.Timeout | null = null;
@@ -205,11 +209,17 @@ export class DeckDispatcher {
   private async handleEnvelopeInner(env: DeckEnvelope): Promise<void> {
     if (env.type === "task.cancel") {
       const taskId = String(env.payload.task_id ?? "");
+      const reason = String(env.payload.reason ?? "Cancelled by T0/T1");
+      if (taskId) {
+        this.cancelledTasks.set(taskId, reason);
+      }
       const child = this.activeChildren.get(taskId);
       if (child) {
-        this.log(`Cancelling running task ${taskId}`);
+        this.log(`Cancelling running task ${taskId}: ${reason}`);
         killProcessTree(child);
         this.activeChildren.delete(taskId);
+      } else {
+        this.log(`Cancel requested for non-running task ${taskId} (${reason}).`);
       }
       await this.options.client.ackEnvelope(env.id, this.agentId);
       return;
@@ -246,10 +256,52 @@ export class DeckDispatcher {
     } finally {
       this.runningTasks.delete(task.task_id);
       this.activeChildren.delete(task.task_id);
+      this.cancelledTasks.delete(task.task_id);
     }
   }
 
+  private async materializeAttachments(
+    taskId: string,
+    attachments: DeckEnvelope["attachments"]
+  ): Promise<{ inputDir?: string; files: MaterializedInputFile[] }> {
+    if (!attachments || attachments.length === 0) {
+      return { files: [] };
+    }
+    const safeTaskDir = taskId.replace(/[^A-Za-z0-9_-]/g, "_");
+    const inputDir = path.resolve(this.options.workstation.worktree_root, "_inputs", safeTaskDir);
+    fs.mkdirSync(inputDir, { recursive: true });
+    const files: MaterializedInputFile[] = [];
+    for (const att of attachments) {
+      try {
+        const downloaded = await this.options.client.downloadArtifact(att.artifact_id);
+        if (!downloaded) continue;
+        const safeName = path.basename(att.filename || downloaded.meta.filename).replace(/[<>:"/\\|?*\x00-\x1f]/g, "_");
+        const localPath = path.join(inputDir, safeName);
+        fs.writeFileSync(localPath, downloaded.data);
+        files.push({
+          filename: safeName,
+          localPath,
+          mimeType: att.mime_type || downloaded.meta.mime_type || "application/octet-stream",
+          sizeBytes: downloaded.data.length,
+        });
+      } catch (err) {
+        this.log(`Failed to materialize attachment ${att.artifact_id}: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+    return { inputDir: files.length > 0 ? inputDir : undefined, files };
+  }
+
   private async executeTask(env: DeckEnvelope, task: TaskDispatchPayload): Promise<void> {
+    if (this.cancelledTasks.has(task.task_id)) {
+      const reason = this.cancelledTasks.get(task.task_id)!;
+      await this.reportResult(env, task, "none", {
+        status: "cancelled",
+        summary: `Task ${task.task_id} was cancelled before start: ${reason}`,
+        synthesized_by_dispatcher: true,
+      });
+      return;
+    }
+
     const wsCfg = this.options.workstation.workspaces[task.project];
     if (!wsCfg) {
       await this.reportResult(env, task, "none", {
@@ -279,6 +331,11 @@ export class DeckDispatcher {
       existingBranch: task.existing_branch,
     });
 
+    const staged = await this.materializeAttachments(task.task_id, env.attachments);
+    if (staged.files.length > 0) {
+      this.log(`Materialized ${staged.files.length} input file(s) for ${task.task_id} in ${staged.inputDir}`);
+    }
+
     await this.options.client.sendEnvelope({
       trace_id: env.trace_id,
       from: { agent_id: this.agentId, role: "worker", tier: "T2" },
@@ -295,13 +352,14 @@ export class DeckDispatcher {
       hop_count: env.hop_count + 1,
     });
 
-    const prompt = buildTaskPrompt(task);
+    const prompt = buildTaskPrompt(task, { inputFiles: staged.files });
     const built = driverSpec.buildCommand({
       binary: engineer.binary ?? driverSpec.defaultBinary,
       prompt,
       sandbox: task.sandbox_profile,
       task,
       cwd: prepared.cwd,
+      extraDirs: staged.inputDir ? [staged.inputDir] : undefined,
       commandTemplate: engineer.commandTemplate,
     });
     this.log(
@@ -315,7 +373,11 @@ export class DeckDispatcher {
     let stdoutLineBuf = "";
     let stderrLineBuf = "";
     let sessionId: string | undefined;
+    let lastStage = "running";
     let lastProgressAt = Date.now();
+    const startedAt = Date.now();
+    const hbSec = Number(process.env.DECK_DISPATCH_HEARTBEAT_SEC ?? 75);
+    const heartbeatIntervalMs = this.options.heartbeatIntervalMs ?? (Number.isFinite(hbSec) && hbSec >= 10 ? hbSec * 1000 : 75_000);
 
     const exitCode = await new Promise<number>((resolve) => {
       const needsShell = process.platform === "win32" && /\.(cmd|bat)$/i.test(built.command);
@@ -328,6 +390,7 @@ export class DeckDispatcher {
           DECK_TASK_ID: task.task_id,
           DECK_TRACE_ID: env.trace_id,
           DECK_SECRETARY_ID: env.from.agent_id,
+          ...(staged.inputDir ? { DECK_INPUT_DIR: staged.inputDir } : {}),
         },
         stdio: [hasStdin ? "pipe" : "ignore", "pipe", "pipe"],
         shell: needsShell,
@@ -346,21 +409,58 @@ export class DeckDispatcher {
         killProcessTree(child);
       }, task.timeout_sec * 1000);
 
+      const taskHbTimer =
+        heartbeatIntervalMs > 0
+          ? setInterval(() => {
+              const elapsedSec = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+              void this.options.client
+                .sendEnvelope({
+                  trace_id: env.trace_id,
+                  from: { agent_id: this.agentId, role: "worker", tier: "T2" },
+                  to: { agent_id: env.from.agent_id, role: "secretary", tier: "T1" },
+                  type: "task.progress",
+                  payload: {
+                    task_id: task.task_id,
+                    driver: engineer.name,
+                    stage: lastStage,
+                    elapsed_sec: elapsedSec,
+                    heartbeat: true,
+                    detail: `${engineer.name} 已运行 ${elapsedSec}s（当前阶段 ${lastStage}）`,
+                  },
+                  hop_count: env.hop_count + 1,
+                })
+                .catch(() => {});
+            }, heartbeatIntervalMs)
+          : null;
+
+      const clearTimers = () => {
+        clearTimeout(timer);
+        if (taskHbTimer) clearInterval(taskHbTimer);
+      };
+
       const handleProgressLine = (line: string) => {
         if (!line.trim()) return;
         const clean = scrubSecrets(line);
         const parsed = driverSpec.parseProgressLine?.(clean);
         if (parsed?.sessionId) sessionId = parsed.sessionId;
-        if (parsed?.stage && Date.now() - lastProgressAt > 15_000) {
-          lastProgressAt = Date.now();
-          void this.options.client.sendEnvelope({
-            trace_id: env.trace_id,
-            from: { agent_id: this.agentId, role: "worker", tier: "T2" },
-            to: { agent_id: env.from.agent_id, role: "secretary", tier: "T1" },
-            type: "task.progress",
-            payload: { task_id: task.task_id, driver: engineer.name, stage: parsed.stage },
-            hop_count: env.hop_count + 1,
-          });
+        if (parsed?.stage) {
+          lastStage = parsed.stage;
+          if (Date.now() - lastProgressAt > 15_000) {
+            lastProgressAt = Date.now();
+            void this.options.client.sendEnvelope({
+              trace_id: env.trace_id,
+              from: { agent_id: this.agentId, role: "worker", tier: "T2" },
+              to: { agent_id: env.from.agent_id, role: "secretary", tier: "T1" },
+              type: "task.progress",
+              payload: {
+                task_id: task.task_id,
+                driver: engineer.name,
+                stage: parsed.stage,
+                elapsed_sec: Math.max(1, Math.round((Date.now() - startedAt) / 1000)),
+              },
+              hop_count: env.hop_count + 1,
+            });
+          }
         }
       };
 
@@ -382,13 +482,13 @@ export class DeckDispatcher {
       });
       child.on("error", (err) => {
         stderrRaw += `\n[DISPATCHER_SPAWN_ERROR] ${err.message}\n`;
-        clearTimeout(timer);
+        clearTimers();
         resolve(127);
       });
       child.on("close", (code) => {
         if (stdoutLineBuf) handleProgressLine(stdoutLineBuf);
         if (stderrLineBuf) handleProgressLine(stderrLineBuf);
-        clearTimeout(timer);
+        clearTimers();
         resolve(code ?? 1);
       });
     });
@@ -400,6 +500,21 @@ export class DeckDispatcher {
     );
     if (alreadySubmitted) {
       this.log(`Task ${task.task_id} already reported via MCP by ${engineer.name}.`);
+      return;
+    }
+
+    const cancelReason = this.cancelledTasks.get(task.task_id);
+    if (cancelReason !== undefined) {
+      this.log(`Task ${task.task_id} terminated via task.cancel (${cancelReason}).`);
+      await this.reportResult(env, task, engineer.name, {
+        status: "cancelled",
+        summary: `工单 ${task.task_id} 已被手动中止：${cancelReason}`,
+        branch: prepared.branch,
+        worktree_path: prepared.isolated ? prepared.cwd : undefined,
+        exit_code: exitCode,
+        session_id: sessionId,
+        synthesized_by_dispatcher: true,
+      });
       return;
     }
 
