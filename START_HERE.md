@@ -23,6 +23,7 @@
 
 | 目录 / 文件 | 用途 | 适用阶段 |
 | :--- | :--- | :--- |
+| [`skills/harness-deck/SKILL.md`](skills/harness-deck/SKILL.md) | **全体系核心认知 Skill**（架构世界观、信任红线、协议与驱动心智模型） | 任意 Agent 通用 |
 | [`skills/deck-onboarding/SKILL.md`](skills/deck-onboarding/SKILL.md) | **0 基础交互式总装机向导**（必读） | Day-0 初始化 |
 | [`skills/deck-pilot/SKILL.md`](skills/deck-pilot/SKILL.md) | **日常驾驭与运维控制台**（状态体检、一键守护、派单/续聊/取消、审批排障） | 日常高频使用 |
 | [`skills/deck-install-qq/SKILL.md`](skills/deck-install-qq/SKILL.md) | `Qmmi + NapCat` 本地 / 远程 SSH 双分支部署剧本 | 场景一 / 二 |

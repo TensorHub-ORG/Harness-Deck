@@ -71,6 +71,7 @@ pnpm pack:bundle
 
 ## 文档导航
 
+- 🧠 全体系认知 Skill（给任意 Agent 安装即懂）：[`skills/harness-deck/SKILL.md`](skills/harness-deck/SKILL.md)（已配置 [`.agents/skills.json`](.agents/skills.json) 自动发现）
 - 🧭 Agent 0 基础装机引导入口：[`START_HERE.md`](START_HERE.md)
 - 🎛️ Agent 日常驾驭与运维 Skill：[`skills/deck-pilot/SKILL.md`](skills/deck-pilot/SKILL.md)
 - 🤖 新会话 Agent 极速接手（A2A 上下文交接文档）：[`docs/A2A_HANDOFF.md`](docs/A2A_HANDOFF.md)（自动发现入口：[`AGENTS.md`](AGENTS.md)）
